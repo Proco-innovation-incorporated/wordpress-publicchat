@@ -43,6 +43,9 @@
         <div v-if="showEmoji && !isEditing" class="sc-user-input--button">
           <EmojiIcon :on-emoji-picked="_handleEmojiPicked" :color="colors.userInput.text" />
         </div>
+        <div v-if="showEmoji && !isEditing" @click="_handleEmojiPicked('👍')" class="sc-user-input--button">
+         👍
+        </div>
         <div v-if="showFile && !isEditing" class="sc-user-input--button">
           <FileIcons :on-change="_handleFileSubmit" :color="colors.userInput.text" />
         </div>
@@ -300,6 +303,7 @@ export default {
 }
 
 .sc-user-input--text {
+  text-align: left;
   flex-grow: 1;
   outline: none;
   border-bottom-left-radius: 10px;

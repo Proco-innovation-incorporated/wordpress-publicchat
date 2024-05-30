@@ -13,7 +13,7 @@
     :show-close-button="true"
     :show-launcher="true"
     :show-emoji="true"
-    :show-file="true"
+    :show-file="false"
     :show-typing-indicator="showTypingIndicator"
     :show-edition="true"
     :show-deletion="true"
@@ -57,13 +57,44 @@ import messageHistory from "./messageHistory.js";
 import chatParticipants from './chatProfiles'
 import availableColors from './colors'
 import { emitter } from "./chat/event/index.js";
+
+function tryToGetMediaFromMessage(message) {
+  const imageRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/gi;
+  const fileRegex = /(https?:\/\/[^\s]+\.(?:pdf|docx|doc|xls|xlsx))/gi;
+
+  const imageLinks = message.data.text.match(imageRegex);
+  const fileLinks = message.data.text.match(fileRegex);
+
+  const listOfArray = [
+    ...(imageLinks || []),
+    ...(fileLinks || [])
+  ];
+  return listOfArray.map(item => {
+    return {
+      type: 'file',
+      author: message.author,
+      id: message.message + Math.random(),
+      data: {
+        // text: `What about this one instead?? `,
+        file: {
+          url: item
+        },
+        // meta: '✓✓ Read'
+      }
+    }
+  })
+}
+
 export default {
   name: 'App',
   data() {
     return {
       participants: chatParticipants,
       titleImageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
-      messageList: messageHistory,
+      messageList: messageHistory.map(item => {
+        const countOfPArsed = tryToGetMediaFromMessage(item)
+        return countOfPArsed.length ? [item].concat(countOfPArsed) : [item]
+      }).flat(),
       newMessagesCount: 0,
       isChatOpen: false,
       showTypingIndicator: '',
@@ -84,7 +115,7 @@ export default {
     }
   },
   created() {
-    this.setColor('blue')
+    this.setColor('dark')
   },
   mounted() {
     this.messageList.forEach((x) => (x.liked = false))

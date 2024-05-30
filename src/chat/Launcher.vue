@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="chatData">
     <div
       v-if="showLauncher"
       class="sc-launcher"
@@ -10,8 +10,14 @@
       <div v-if="newMessagesCount > 0 && !isOpen" class="sc-new-messsages-count">
         {{ newMessagesCount }}
       </div>
-      <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" :alt="icons.close.name" />
-      <img v-else class="sc-open-icon" :src="icons.open.img" :alt="icons.open.name" />
+      <template v-if="loadedConnection">
+        <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" :alt="icons.close.name" />
+        <img v-else class="sc-open-icon" :src="icons.open.img" :alt="icons.open.name" />
+      </template>
+
+      <div v-if="!loadedConnection" style="position: absolute; top:-100%; left: 0; width: 100%; height: 100%">
+        <Loader name="showLauncher"></Loader>
+      </div>
     </div>
     <ChatWindow
       :message-list="messageList"
@@ -61,15 +67,20 @@
 </template>
 
 <script>
-import store from './store/'
+import store, {mapState} from './store/'
+import {watch} from 'vue'
 import ChatWindow from './ChatWindow.vue'
 
 import CloseIcon from './assets/close-icon.png'
 import OpenIcon from './assets/logo-no-bg.svg'
 import {emitter} from "./event/index.js";
+import {createSocketConnection} from "./socket/index.js";
+import Loader from "./loading-worker/Loader.vue";
+import {finishSpinnerByName, startSpinnerByName} from "./loading-worker";
 
 export default {
   components: {
+    Loader,
     ChatWindow
   },
   props: {
@@ -239,6 +250,27 @@ export default {
           store.setState(prop, props[prop])
         }
       }
+    }
+  },
+  setup() {
+    const { chatData, loadedConnection } = mapState(['chatData', 'loadedConnection']);
+
+    watch(chatData, (value) => {
+      if(value) {
+        setTimeout(() => {
+          startSpinnerByName('showLauncher')
+          createSocketConnection(value.clientId)
+        }, 0)
+      }
+    })
+    watch(loadedConnection, (value) => {
+      if(value) {
+        finishSpinnerByName('showLauncher')
+      }
+    })
+    return {
+      chatData,
+      loadedConnection
     }
   },
   methods: {

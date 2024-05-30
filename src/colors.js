@@ -85,14 +85,14 @@ export default {
   },
   dark: {
     header: {
-      bg: '#34495e',
+      bg: '#466281',
       text: '#ecf0f1'
     },
     launcher: {
-      bg: '#34495e'
+      bg: '#466281'
     },
     messageList: {
-      bg: '#2c3e50'
+      bg: '#466281'
     },
     sentMessage: {
       bg: '#7f8c8d',

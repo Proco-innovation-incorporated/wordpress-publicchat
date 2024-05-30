@@ -9,7 +9,8 @@ import {computed, ref} from "vue";
 
 const store = {
   state: ref({
-    editMessage: null
+    editMessage: null,
+    loadedConnection: false,
   }),
   setupFirst: () => {
     store.state = ref({
