@@ -9,6 +9,11 @@ export default defineConfig({
     vue(), vueJsx(),
     DefineOptions()
   ],
+  css: {
+    modules: {
+      localsConvention: 'camelCase'
+    },
+  },
   build: {
     chunkSizeWarningLimit: 5000,
   },

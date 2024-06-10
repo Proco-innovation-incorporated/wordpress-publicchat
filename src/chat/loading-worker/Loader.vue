@@ -45,35 +45,5 @@ watch(
 <style lang="scss" scoped>
 //@import "@styles/mixins";
 
-.spiner-wrapper {
-  background: var(--gray_400); // TODO move to var
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  //@include flexFullCenter;
 
-  img {
-    width: 220px;
-    height: 248px;
-  }
-
-  &.spiner-wrapper__page {
-    position: fixed;
-  }
-
-  &.spiner-wrapper__local {
-    position: absolute;
-
-    img {
-      width: 80px;
-      height: 100px;
-    }
-  }
-
-}
 </style>

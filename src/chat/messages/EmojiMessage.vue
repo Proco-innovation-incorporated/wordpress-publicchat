@@ -14,7 +14,5 @@ export default {
 </script>
 
 <style scoped>
-.sc-message--emoji {
-  font-size: 40px;
-}
+
 </style>

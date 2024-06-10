@@ -6,7 +6,7 @@ const defaultComponentName = 'BubbleChat'
 const Plugin = {
   install(Vue, options = {}) {
     /**
-     * Makes sure that plugin can be installed only once
+     * Makes sure that chat-plugin can be installed only once
      */
     if (this.installed) {
       return

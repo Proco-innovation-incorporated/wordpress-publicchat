@@ -36,7 +36,7 @@
       </template>
     </Message>
     <Message
-      v-show="showTypingIndicator !== ''"
+      v-show="showTypingIndicator"
       :message="{author: showTypingIndicator, type: 'typing'}"
       :user="profile(showTypingIndicator)"
       :colors="colors"
@@ -115,10 +115,4 @@ export default {
 </script>
 
 <style scoped>
-.sc-message-list {
-  height: 80%;
-  overflow-y: auto;
-  background-size: 100%;
-  padding: 40px 20px;
-}
 </style>

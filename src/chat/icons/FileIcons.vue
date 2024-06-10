@@ -37,16 +37,5 @@ export default {
 </script>
 
 <style scoped>
-input[type='file'] {
-  display: none;
-}
 
-.sc-user-input--file-icon-wrapper {
-  display: block;
-  cursor: pointer;
-}
-
-.sc-user-input--file-icon {
-  display: block;
-}
 </style>

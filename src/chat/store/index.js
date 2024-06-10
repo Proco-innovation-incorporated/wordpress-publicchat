@@ -1,5 +1,5 @@
 /*
- * Use store pattern instead of Vuex since this is a plugin
+ * Use store pattern instead of Vuex since this is a chat-plugin
  * and instantiated externally
  **/
 
@@ -12,6 +12,11 @@ const store = {
     editMessage: null,
     loadedConnection: false,
   }),
+  socket: null,
+  setSocket(socket, userId) {
+    this.socket = socket;
+    this.socket.userId= userId;
+  },
   setupFirst: () => {
     store.state = ref({
       editMessage: null
@@ -28,7 +33,6 @@ const store = {
 
 function mapState(keys) {
   const map = {}
-  debugger
   keys.forEach((key) => {
     map[key] = computed(() => {
       return store.state.value[key]
@@ -36,6 +40,20 @@ function mapState(keys) {
   })
   return map
 }
+
+function sendSocketMessage (message) {
+  if(store.socket) {
+    store.socket.send(JSON.stringify({
+      version: 'v1',
+      message: message,
+      userid: store.socket.userId
+    }));
+  }
+}
+
+function closeSocketConnection () {
+  store.socket = null;
+}
 window.store = store
 export default store
-export {mapState}
+export {mapState, sendSocketMessage, closeSocketConnection}

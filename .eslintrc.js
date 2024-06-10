@@ -5,14 +5,14 @@ module.exports = {
   },
   extends: [
     '@antfu/eslint-config-vue',
-    'plugin:vue/vue3-recommended',
-    'plugin:import/recommended',
-    'plugin:import/typescript',
-    'plugin:promise/recommended',
-    'plugin:sonarjs/recommended',
-    'plugin:@typescript-eslint/recommended',
+    'chat-plugin:vue/vue3-recommended',
+    'chat-plugin:import/recommended',
+    'chat-plugin:import/typescript',
+    'chat-plugin:promise/recommended',
+    'chat-plugin:sonarjs/recommended',
+    'chat-plugin:@typescript-eslint/recommended',
 
-    // 'plugin:unicorn/recommended',
+    // 'chat-plugin:unicorn/recommended',
   ],
   parser: 'vue-eslint-parser',
   parserOptions: {
@@ -91,7 +91,7 @@ module.exports = {
       { blankLine: 'always', prev: '*', next: 'multiline-const' },
     ],
 
-    // Plugin: eslint-plugin-import
+    // Plugin: eslint-chat-plugin-import
     'import/prefer-default-export': 'off',
     'import/newline-after-import': ['error', { count: 1 }],
     'no-restricted-imports': ['error', 'vuetify/components'],
@@ -125,11 +125,11 @@ module.exports = {
 
     '@typescript-eslint/consistent-type-imports': 'error',
 
-    // Plugin: eslint-plugin-promise
+    // Plugin: eslint-chat-plugin-promise
     'promise/always-return': 'off',
     'promise/catch-or-return': 'off',
 
-    // ESLint plugin vue
+    // ESLint chat-plugin vue
     'vue/block-tag-newline': 'error',
     'vue/component-api-style': 'error',
     'vue/component-name-in-template-casing': ['error', 'PascalCase', { registeredComponentsOnly: false }],
@@ -221,7 +221,7 @@ module.exports = {
         {
           regex: 'import axios from \'axios\'',
           replacement: 'import axios from \'@axios\'',
-          message: 'Use axios instances created in \'src/plugin/axios.ts\' instead of unconfigured axios',
+          message: 'Use axios instances created in \'src/chat-plugin/axios.ts\' instead of unconfigured axios',
           files: {
             ignore: '^.*plugins/axios.ts.*',
           },

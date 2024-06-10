@@ -17,6 +17,7 @@
     :show-typing-indicator="showTypingIndicator"
     :show-edition="true"
     :show-deletion="true"
+    :title="'WSI Helper'"
     :title-image-url="titleImageUrl"
     :disable-user-list-toggle="false"
     @onType="handleOnType"
@@ -57,7 +58,22 @@ import messageHistory from "./messageHistory.js";
 import chatParticipants from './chatProfiles'
 import availableColors from './colors'
 import { emitter } from "./chat/event/index.js";
-
+import {sendSocketMessage} from "./chat/store/index.js";
+import * as emoji from 'node-emoji'
+function getMediaMessage(author, id, file) {
+  return {
+    type: 'file',
+    author: author,
+    id: id + Math.random(),
+      data: {
+      // text: `What about this one instead?? `,
+      file: {
+        url: file
+      },
+      // meta: '✓✓ Read'
+    }
+  }
+}
 function tryToGetMediaFromMessage(message) {
   const imageRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/gi;
   const fileRegex = /(https?:\/\/[^\s]+\.(?:pdf|docx|doc|xls|xlsx))/gi;
@@ -69,19 +85,9 @@ function tryToGetMediaFromMessage(message) {
     ...(imageLinks || []),
     ...(fileLinks || [])
   ];
+
   return listOfArray.map(item => {
-    return {
-      type: 'file',
-      author: message.author,
-      id: message.message + Math.random(),
-      data: {
-        // text: `What about this one instead?? `,
-        file: {
-          url: item
-        },
-        // meta: '✓✓ Read'
-      }
-    }
+    return getMediaMessage(message.author, message.message, item);
   })
 }
 
@@ -90,7 +96,7 @@ export default {
   data() {
     return {
       participants: chatParticipants,
-      titleImageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
+      titleImageUrl: 'https://avatars.slack-edge.com/2023-11-08/6167902866547_40bae925c2a284f1ae73_88.jpg',
       messageList: messageHistory.map(item => {
         const countOfPArsed = tryToGetMediaFromMessage(item)
         return countOfPArsed.length ? [item].concat(countOfPArsed) : [item]
@@ -115,28 +121,51 @@ export default {
     }
   },
   created() {
-    this.setColor('dark')
+    this.setColor('blue')
   },
   mounted() {
+    emitter.$on('onmessage', (event) => {
+      if(event.msg_type === 'system' && !event.success) {
+        Object.assign({}, {
+          type: 'system',
+
+          data: {
+            text: event.response
+          },
+          author: `bot`
+        }, {id: event.id})
+        this.showTypingIndicator = '';
+      }
+      if(!event.msg_type || event.msg_type === 'bot') {
+        const message = Object.assign({}, {
+          type: 'text',
+          data: {
+            text: event.response
+          },
+          author: `bot`
+        }, {id: event.id})
+        const messages = tryToGetMediaFromMessage(message)
+        this.messageList = [
+          ...this.messageList,
+          message,
+          ...messages,
+          ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
+        ]
+        this.showTypingIndicator = '';
+      }
+    })
     this.messageList.forEach((x) => (x.liked = false))
   },
   methods: {
-    sendMessage(text) {
-      if (text.length > 0) {
-        this.newMessagesCount = this.isChatOpen ? this.newMessagesCount : this.newMessagesCount + 1
-        this.onMessageWasSent({
-          author: 'support',
-          type: 'text',
-          id: Math.random(),
-          data: {text}
-        })
-      }
-    },
-    handleTyping(text) {
-      this.showTypingIndicator =
-        text.length > 0 ? this.participants[this.participants.length - 1].id : ''
-    },
     onMessageWasSent(message) {
+
+      if(message.type === 'emoji') {
+        const obj = emoji.which(message.data.emoji);
+        sendSocketMessage(obj)
+      } else {
+        sendSocketMessage(message.data.text)
+      }
+      this.showTypingIndicator = true;
       this.messageList = [...this.messageList, Object.assign({}, message, {id: Math.random()})]
     },
     openChat() {
@@ -187,6 +216,8 @@ export default {
 </script>
 
 <style scoped>
+@import "normalize.css";
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -199,4 +230,66 @@ export default {
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
 }
+
+a {
+  font-weight: 500;
+  color: #393db0;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #2d308c;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.card {
+  padding: 2em;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+@media (prefers-color-scheme: light) {
+  a:hover {
+    color: #0E142CFF;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
 </style>
