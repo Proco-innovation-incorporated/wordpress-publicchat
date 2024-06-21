@@ -33,7 +33,7 @@ import availableColors from './colors'
 import { emitter } from "./chat/event/index.js";
 import {sendSocketMessage} from "./chat/store/index.js";
 import * as emoji from 'node-emoji';
-import imgUrl from './chat/assets/bot-logo.png'
+
 function getMediaMessage(author, id, file) {
   return {
     type: 'file',
@@ -71,7 +71,7 @@ export default {
     return {
       participants: chatParticipants,
       botTitle: window.botTitle || "EzeeAssist Helper",
-      titleImageUrl: imgUrl,
+      titleImageUrl: window.pluginPath + '/bot-logo.png',
       messageList: messageHistory.map(item => {
         const countOfPArsed = tryToGetMediaFromMessage(item)
         return countOfPArsed.length ? [item].concat(countOfPArsed) : [item]

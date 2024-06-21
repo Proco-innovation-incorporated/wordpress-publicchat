@@ -7,7 +7,8 @@ import Launcher from './chat/Launcher.vue';
 import store from './chat/store'
 import './chat/socket'
 declare const window: any;
-// before new build, this line should be emptied
+
+window.pluginPath = import.meta.env.MODE === 'development' ? '' : '/wp-content/plugins/chat-plugin/assets';
 window.apiBaseUrl = import.meta.env.MODE === 'development' ? import.meta.env.VITE_API_BASE_URL : '';
 // before new build, make sure the title is correct
 window.botTitle = 'WSI AI Assistant';
