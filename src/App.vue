@@ -1,50 +1,23 @@
 <template>
-  <BubbleChat
-    :always-scroll-to-bottom="alwaysScrollToBottom"
-    :close="closeChat"
-    :colors="colors"
-    :is-open="isChatOpen"
-    :message-list="messageList"
-    :message-styling="messageStyling"
-    :new-messages-count="newMessagesCount"
-    :on-message-was-sent="onMessageWasSent"
-    :open="openChat"
-    :participants="participants"
-    :show-close-button="true"
-    :show-launcher="true"
-    :show-emoji="true"
-    :show-file="false"
-    :show-typing-indicator="showTypingIndicator"
-    :show-edition="true"
-    :show-deletion="true"
-    :title="'WSI Helper'"
-    :title-image-url="titleImageUrl"
-    :disable-user-list-toggle="false"
-    @onType="handleOnType"
-    @edit="editMessage"
-    @remove="removeMessage"
-  >
+  <BubbleChat :always-scroll-to-bottom="alwaysScrollToBottom" :close="closeChat" :colors="colors" :is-open="isChatOpen"
+    :message-list="messageList" :message-styling="messageStyling" :new-messages-count="newMessagesCount"
+    :on-message-was-sent="onMessageWasSent" :open="openChat" :participants="participants" :show-close-button="true"
+    :show-launcher="true" :show-emoji="false" :show-file="false" :show-typing-indicator="showTypingIndicator"
+    :show-edition="true" :show-deletion="true" :title="botTitle" :title-image-url="titleImageUrl"
+    :disable-user-list-toggle="false" @onType="handleOnType" @edit="editMessage" @remove="removeMessage">
     <template v-slot:text-message-toolbox="scopedProps">
-      <button
-        v-if="!scopedProps.me && scopedProps.message.type === 'text'"
-        @click.prevent="like(scopedProps.message.id)"
-      >
+      <button v-if="!scopedProps.me && scopedProps.message.type === 'text'"
+        @click.prevent="like(scopedProps.message.id)">
         👍
       </button>
     </template>
     <template v-slot:text-message-body="scopedProps">
       <p class="sc-message--text-content" v-html="scopedProps.messageText"></p>
-      <p
-        v-if="scopedProps.message.data.meta"
-        class="sc-message--meta"
-        :style="{color: scopedProps.messageColors.color}"
-      >
+      <p v-if="scopedProps.message.data.meta" class="sc-message--meta"
+        :style="{ color: scopedProps.messageColors.color }">
         {{ scopedProps.message.data.meta }}
       </p>
-      <p
-        v-if="scopedProps.message.isEdited || scopedProps.message.liked"
-        class="sc-message--edited"
-      >
+      <p v-if="scopedProps.message.isEdited || scopedProps.message.liked" class="sc-message--edited">
         <template v-if="scopedProps.message.isEdited">✎</template>
         <template v-if="scopedProps.message.liked">👍</template>
       </p>
@@ -59,7 +32,8 @@ import chatParticipants from './chatProfiles'
 import availableColors from './colors'
 import { emitter } from "./chat/event/index.js";
 import {sendSocketMessage} from "./chat/store/index.js";
-import * as emoji from 'node-emoji'
+import * as emoji from 'node-emoji';
+import imgUrl from './chat/assets/bot-logo.png'
 function getMediaMessage(author, id, file) {
   return {
     type: 'file',
@@ -96,7 +70,8 @@ export default {
   data() {
     return {
       participants: chatParticipants,
-      titleImageUrl: 'https://avatars.slack-edge.com/2023-11-08/6167902866547_40bae925c2a284f1ae73_88.jpg',
+      botTitle: window.botTitle || "EzeeAssist Helper",
+      titleImageUrl: imgUrl,
       messageList: messageHistory.map(item => {
         const countOfPArsed = tryToGetMediaFromMessage(item)
         return countOfPArsed.length ? [item].concat(countOfPArsed) : [item]

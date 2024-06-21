@@ -11,15 +11,26 @@ export const createSocketConnection = (params) => {
   } = params
 
   const tokens = ref({
-    access_token,
-    refresh_token
+    access_token: import.meta.env.MODE === 'development' ? localStorage.getItem('access_token') || access_token : access_token,
+    refresh_token: import.meta.env.MODE === 'development' ? localStorage.getItem('refresh_token') || refresh_token : refresh_token
   })
 
   const refresh = async () => {
-    const result = await fetch(`${window.apiBaseUrl}/api/auth/token/refresh?refresh_token=${tokens.value.refresh_token}`)
-      .then(i => i.json())
+    try {
+      const result = await fetch(`${window.apiBaseUrl}/api/auth/token/refresh?refresh_token=${tokens.value.refresh_token}`)
+        .then(i => i.json())
+      if( import.meta.env.MODE === 'development' && result?.access_token && result?.refresh_token) {
+        localStorage.setItem('access_token', result.access_token)
+        localStorage.setItem('refresh_token', result.refresh_token)
+      }
 
-    tokens.value = result;
+      tokens.value = result;
+    } catch (e) {
+      if( import.meta.env.MODE === 'development') {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+      }
+    }
   }
   const auth = async () => {
     await refresh()

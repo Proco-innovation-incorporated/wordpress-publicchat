@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   window.orgToken = pluginData.orgToken;
   window.accessToken = pluginData.accessToken;
   window.refreshToken = pluginData.refreshToken;
+  window.botTitle = 'WSI AI Assistant';
 
   window.setupChatData({
     access_token: `${window.accessToken}`,
