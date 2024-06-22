@@ -109,7 +109,7 @@ export default {
           },
           author: `bot`
         }, {id: event.id})
-        this.showTypingIndicator = '';
+        this.showTypingIndicator = false;
       }
       if(!event.msg_type || event.msg_type === 'bot') {
         const message = Object.assign({}, {
@@ -126,7 +126,7 @@ export default {
           ...messages,
           ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
         ]
-        this.showTypingIndicator = '';
+        this.showTypingIndicator = false;
       }
     })
     this.messageList.forEach((x) => (x.liked = false))

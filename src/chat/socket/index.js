@@ -63,8 +63,14 @@ export const createSocketConnection = (params) => {
     };
 
     socket.onmessage = function(event) {
-      console.log(`[socket] get message from server: ${event.data}`);
-      emitter.$emit('onmessage', JSON.parse(event.data))
+      try {
+        const msg = JSON.parse(event.data);
+        console.log(`[socket] get message from server: ${JSON.stringify(msg, null, 2)}`);
+        emitter.$emit('onmessage', msg);
+
+      } catch (error) {
+        console.error(`[socket] error on message: ${error.message}\noriginal message: ${event.data}`);
+      }
     };
 
     socket.onclose = function(event) {
@@ -75,10 +81,14 @@ export const createSocketConnection = (params) => {
         // обычно в этом случае event.code 1006
         console.log('[close] connection closed dirty ', event.code);
       }
+
+      // emitting new event so that the interface can update itself
+      emitter.$emit('connection-close');
+
     };
 
     socket.onerror = function(error) {
-      console.log(`[error]`, error);
+      console.error(`[error]`, error);
     };
 
     createIntervalBeforeRefresh(socket)
