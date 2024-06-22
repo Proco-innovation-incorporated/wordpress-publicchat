@@ -12,7 +12,7 @@
       </button>
     </template>
     <template v-slot:text-message-body="scopedProps">
-      <p class="sc-message--text-content" v-html="scopedProps.messageText"></p>
+      <p class="sc-message--text-content" v-html="scopedProps.message.data.text"></p>
       <p v-if="scopedProps.message.data.meta" class="sc-message--meta"
         :style="{ color: scopedProps.messageColors.color }">
         {{ scopedProps.message.data.meta }}
@@ -119,11 +119,11 @@ export default {
           },
           author: `bot`
         }, {id: event.id})
-        const messages = tryToGetMediaFromMessage(message)
+        // const messages = tryToGetMediaFromMessage(message)
         this.messageList = [
           ...this.messageList,
           message,
-          ...messages,
+          // ...messages,
           ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
         ]
         this.showTypingIndicator = false;

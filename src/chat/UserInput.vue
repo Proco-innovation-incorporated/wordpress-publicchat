@@ -19,13 +19,13 @@
           <EmojiIcon :on-emoji-picked="_handleEmojiPicked" :color="colors.userInput.text" />
         </div>
 <!--        v-if="showEmoji && !isEditing"-->
-        <div  @click="_handleEmojiPicked('👍')" class="sc-user-input--button">
+        <div  @click="_handleEmojiPicked('👍')" class="sc-user-input--button" style="cursor: pointer; margin-right: 10px;">
           👍
         </div>
-<!--        v-if="showEmoji && !isEditing"-->
-        <div  @click="_handleEmojiPicked('👎')" class="sc-user-input--button">
+        <!--        v-if="showEmoji && !isEditing"-->
+        <div  @click="_handleEmojiPicked('👎')" class="sc-user-input--button" style="cursor: pointer; margin-right: 10px;">
           👎
-        </div>
+          </div>
         <div v-if="showFile && !isEditing" class="sc-user-input--button">
           <FileIcons :on-change="_handleFileSubmit" :color="colors.userInput.text" />
         </div>
