@@ -1,4 +1,5 @@
-export default [
+import {computed} from 'vue'
+export default computed(() => [
   {
     id: 'user',
     name: 'User',
@@ -7,6 +8,6 @@ export default [
   {
     id: 'bot',
     name: 'Ezee Assist',
-    imageUrl: 'https://avatars.slack-edge.com/2023-11-08/6167902866547_40bae925c2a284f1ae73_88.jpg'
+    imageUrl: window.pluginPath + '/bot-logo.png'
   }
-]
+])

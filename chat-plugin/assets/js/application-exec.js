@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
   window.apiBaseUrl = 'https://channel.dev.ezeeassist.io';
-  window.pluginPath = '/wp-content/plugins/chat-plugin/assets';
+  window.pluginPath = pluginData.pluginBasePath
+    ? `${pluginData.pluginBasePath}assets`
+    :  window.pluginPath || '/wp-content/plugins/chat-plugin/assets';
   window.clientEmail = pluginData.clientEmail;
   window.orgToken = pluginData.orgToken;
   window.accessToken = pluginData.accessToken;

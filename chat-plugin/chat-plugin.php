@@ -14,17 +14,8 @@ function is_divi_builder_active() {
   return strpos($_SERVER['REQUEST_URI'], 'et_fb') !== false;
 }
 
-if(wp_doing_ajax() || defined('DOING_CRON') || defined('REST_REQUEST')) {
+if(defined('DOING_CRON') || defined('REST_REQUEST')) {
   exit;
-}
-
-$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
-foreach ( $backtrace as $trace ) {
-  if ( isset( $trace['file'] ) && strpos( $trace['file'], '/wp-content/plugins/' ) !== false ) {
-    if ( strpos( $trace['file'], plugin_basename(__FILE__) ) === false ) {
-      exit;
-    }
-  }
 }
 
 if(!is_divi_builder_active() && !is_admin()) {
@@ -94,7 +85,7 @@ if(!is_divi_builder_active() && !is_admin()) {
 
   function enqueue_chat_plugin_script() {
     // Enqueue your JavaScript file
-    wp_enqueue_script('your-script-handle', '/wp-content/plugins/chat-plugin/assets/js/application-exec.js');
+    wp_enqueue_script('your-script-handle', plugin_dir_url(__FILE__).'assets/js/application-exec.js');
 
     // Retrieve necessary data
     $options = get_option('chat_plugin_settings');
@@ -110,6 +101,7 @@ if(!is_divi_builder_active() && !is_admin()) {
       'clientEmail' => esc_js($client_email_external),
       'accessToken' => esc_js($access_token),
       'refreshToken' => esc_js($refresh_token),
+      'pluginBasePath' => esc_js(plugin_dir_url(__FILE__)),
     ));
   }
   add_action('wp_enqueue_scripts', 'enqueue_chat_plugin_script');

@@ -69,7 +69,6 @@ export default {
   name: 'App',
   data() {
     return {
-      participants: chatParticipants,
       botTitle: window.botTitle || "EzeeAssist Helper",
       titleImageUrl: window.pluginPath + '/bot-logo.png',
       messageList: messageHistory.map(item => {
@@ -93,6 +92,9 @@ export default {
     },
     backgroundColor() {
       return this.chosenColor === 'dark' ? this.colors.messageList.bg : '#fff'
+    },
+    participants() {
+      return chatParticipants.value
     }
   },
   created() {

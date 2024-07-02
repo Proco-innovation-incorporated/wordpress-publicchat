@@ -353,11 +353,11 @@ a.chatLink {
 }
 
 .sc-header--img {
-  border-radius: 50%;
+  /*border-radius: 50%;*/
   align-self: center;
   padding: 10px;
-  height: 60px !important;
-  width: 60px !important;
+  height: 35px !important;
+  /*width: 60px !important; skip for current plugin*/
 }
 
 .sc-header--title {
