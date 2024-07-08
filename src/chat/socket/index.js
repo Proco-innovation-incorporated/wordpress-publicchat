@@ -41,13 +41,15 @@ export const createSocketConnection = (params) => {
 
 
   const createIntervalBeforeRefresh = (socket) => {
-    const interval = setInterval(() => {
-      closeSocketConnection()
-      socket.close()
-      refresh()
-      clearInterval(interval)
-    }, 1000 * 60 * 9)
+    const interval = setInterval(async () => {
+      socket.close();
+      closeSocketConnection();
+      await refresh();
+      clearInterval(interval);
+      createConnection();
+    }, 1000 * 60 * 8)
   }
+
 
   const createConnection = () => {
     const socket = new WebSocket(
@@ -79,7 +81,7 @@ export const createSocketConnection = (params) => {
       } else {
         // например, сервер убил процесс или сеть недоступна
         // обычно в этом случае event.code 1006
-        console.log('[close] connection closed dirty ', event.code);
+        console.error('[close] connection closed dirty ', event.code, event.reason);
       }
 
       // emitting new event so that the interface can update itself
