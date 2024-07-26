@@ -11,6 +11,7 @@ const store = {
   state: ref({
     editMessage: null,
     loadedConnection: false,
+    error: null
   }),
   socket: null,
   setSocket(socket, userId) {

@@ -31,7 +31,7 @@ import messageHistory from "./messageHistory.js";
 import chatParticipants from './chatProfiles'
 import availableColors from './colors'
 import { emitter } from "./chat/event/index.js";
-import {sendSocketMessage} from "./chat/store/index.js";
+import {mapState, sendSocketMessage} from "./chat/store/index.js";
 import * as emoji from 'node-emoji';
 
 function getMediaMessage(author, id, file) {
@@ -83,7 +83,12 @@ export default {
       chosenColor: null,
       alwaysScrollToBottom: true,
       messageStyling: true,
-      userIsTyping: false
+      userIsTyping: false,
+      types: {
+        'user': 'me',
+        'bot': 'bot'
+      },
+      messageListCopy: []
     }
   },
   computed: {
@@ -95,6 +100,14 @@ export default {
     },
     participants() {
       return chatParticipants.value
+    },
+    ...mapState(['error'])
+  },
+  watch: {
+    error(value) {
+      if(!value) {
+        this.messageList = []
+      }
     }
   },
   created() {
@@ -102,38 +115,53 @@ export default {
   },
   mounted() {
     emitter.$on('onmessage', (event) => {
-      if(event.msg_type === 'system' && !event.success) {
-        Object.assign({}, {
-          type: 'system',
-
-          data: {
-            text: event.response
-          },
-          author: `bot`
-        }, {id: event.id})
-        this.showTypingIndicator = false;
-      }
-      if(!event.msg_type || event.msg_type === 'bot') {
-        const message = Object.assign({}, {
-          type: 'text',
-          data: {
-            text: event.response
-          },
-          author: `bot`
-        }, {id: event.id})
-        // const messages = tryToGetMediaFromMessage(message)
-        this.messageList = [
-          ...this.messageList,
-          message,
-          // ...messages,
-          ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
-        ]
-        this.showTypingIndicator = false;
+      if(Array.isArray(event)) {
+        event.forEach(item => {
+          Array.isArray(item) ? item.forEach(nested => this.handleItemSocketAnswer(nested)): this.handleItemSocketAnswer(item)
+        })
+      } else {
+        this.handleItemSocketAnswer(event)
       }
     })
     this.messageList.forEach((x) => (x.liked = false))
   },
   methods: {
+    handleItemSocketAnswer(event) {
+      if(event.msg_type === 'system' && !event.success) {
+        Object.assign({}, {
+          type: 'system',
+          data: {
+            text: event.response
+          },
+          author: `bot`
+        }, {id: event.id})
+        this.showTypingIndicator = false;
+      }
+      if(!event.msg_type || this.types[event.msg_type]) {
+        const message = Object.assign({}, {
+          type: 'text',
+          data: {
+            text: event.response
+          },
+          author: this.types[event.msg_type] || `bot`
+        }, {id: event.id})
+        if(this.isChatOpen) {
+          this.messageList = [
+            ...this.messageList,
+            message,
+            ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
+          ]
+        } else {
+          this.messageListCopy = [
+            ...this.messageList,
+            ...this.messageListCopy,
+            message,
+            ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
+          ]
+        }
+        this.showTypingIndicator = false;
+      }
+    },
     onMessageWasSent(message) {
 
       if(message.type === 'emoji') {
@@ -146,8 +174,14 @@ export default {
       this.messageList = [...this.messageList, Object.assign({}, message, {id: Math.random()})]
     },
     openChat() {
-      this.isChatOpen = true
-      this.newMessagesCount = 0
+      this.isChatOpen = true;
+      setTimeout(() => {
+        this.$nextTick(() => {
+          this.messageList = this.messageListCopy;
+          this.messageListCopy = [];
+          this.newMessagesCount = 0
+        })
+      }, 0)
     },
     closeChat() {
       this.isChatOpen = false

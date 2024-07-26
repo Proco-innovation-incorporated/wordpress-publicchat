@@ -56,12 +56,18 @@ export default {
     }
   },
   blue: {
+    errorInfo: {
+      bg: '#ffffff',
+      text: '#D32F2F',
+    },
     header: {
       bg: '#4e8cff',
-      text: '#ffffff'
+      text: '#ffffff',
+      bgError: '#D32F2F'
     },
     launcher: {
-      bg: '#4e8cff'
+      bg: '#4e8cff',
+      bgError: '#D32F2F'
     },
     messageList: {
       bg: '#ffffff'

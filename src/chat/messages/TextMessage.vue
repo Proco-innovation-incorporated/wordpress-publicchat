@@ -70,12 +70,13 @@ export default {
       const escaped = htmlEscape(this.message.data.text)
 
       try {
+
         return Autolinker.link(this.messageStyling ? fmt(escaped) : escaped, {
           className: 'chatLink',
           truncate: {length: 50, location: 'smart'}
         })
       } catch (e) {
-
+        console.log(e)
       }
 
       return escaped;

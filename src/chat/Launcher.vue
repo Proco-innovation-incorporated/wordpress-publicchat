@@ -4,8 +4,8 @@
       v-if="showLauncher"
       class="sc-launcher"
       :class="{opened: isOpen}"
-      :style="{backgroundColor: colors.launcher.bg}"
-      @click.prevent="isOpen ? close() : openAndFocus()"
+      :style="{backgroundColor:colors.launcher.bg}"
+      @click.prevent="isOpen ? close() : loadedConnection && openAndFocus()"
     >
       <div v-if="newMessagesCount > 0 && !isOpen" class="sc-new-messsages-count">
         {{ newMessagesCount }}
@@ -15,12 +15,13 @@
         <img v-else class="sc-open-icon" :src="icons.open.img" :alt="icons.open.name" />
       </template>
 
-      <div v-if="!loadedConnection" style="position: absolute; top:-100%; left: 0; width: 100%; height: 100%">
+      <div v-show="!loadedConnection" style="position: absolute; top:-100%; left: 0; width: 100%; height: 100%">
         <Loader name="showLauncher"></Loader>
       </div>
     </div>
     <ChatWindow
       :message-list="messageList"
+      :is-loaded="loadedConnection"
       :on-user-input-submit="onMessageWasSent"
       :participants="participants"
       :title="chatWindowTitle"
@@ -253,7 +254,7 @@ export default {
     }
   },
   setup() {
-    const { chatData, loadedConnection } = mapState(['chatData', 'loadedConnection']);
+    const { chatData, loadedConnection, error } = mapState(['chatData', 'loadedConnection', 'error']);
 
     watch(chatData, (value) => {
       if(value) {
@@ -266,11 +267,14 @@ export default {
     watch(loadedConnection, (value) => {
       if(value) {
         finishSpinnerByName('showLauncher')
+      } else {
+        startSpinnerByName('showLauncher')
       }
     })
     return {
       chatData,
-      loadedConnection
+      loadedConnection,
+      error
     }
   },
   methods: {

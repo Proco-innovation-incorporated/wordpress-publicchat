@@ -55,6 +55,7 @@
       @onType="$emit('onType')"
       @edit="$emit('edit', $event)"
     />
+    <div :class="{'is-loaded': !isLoaded}"></div>
   </div>
 </template>
 
@@ -81,6 +82,10 @@ export default {
       default: false
     },
     showHeader: {
+      type: Boolean,
+      default: true
+    },
+    isLoaded: {
       type: Boolean,
       default: true
     },

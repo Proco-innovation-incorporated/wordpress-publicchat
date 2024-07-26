@@ -10,22 +10,23 @@
       <span class="delete-file-message" @click="cancelFile()"><img :src="icons.closeSvg.img" :alt="icons.closeSvg.name"
           height="10" title="Remove the file" /></span>
     </div>
-    <form class="sc-user-input" :class="{ active: inputActive }" :style="{ background: colors.userInput.bg }">
+    <form class="sc-user-input" :class="{ active: inputActive }" v-if="!error" :style="{ background: colors.userInput.bg }">
       <div ref="userInput" role="button" tabIndex="0" contentEditable="true" :placeholder="placeholder"
         class="sc-user-input--text" :style="{ color: colors.userInput.text }" @focus="setInputActive(true)"
         @blur="setInputActive(false)" @keydown="handleKey" @focusUserInput="focusUserInput()"></div>
-      <div class="sc-user-input--buttons">
+      <div class="sc-user-input--buttons" >
         <div v-if="showEmoji && !isEditing" class="sc-user-input--button">
           <EmojiIcon :on-emoji-picked="_handleEmojiPicked" :color="colors.userInput.text" />
         </div>
 <!--        v-if="showEmoji && !isEditing"-->
+        <div  @click="_handleEmojiPicked('👎')" class="sc-user-input--button" style="cursor: pointer; margin-right: 10px;">
+          👎
+        </div>
         <div  @click="_handleEmojiPicked('👍')" class="sc-user-input--button" style="cursor: pointer; margin-right: 10px;">
           👍
         </div>
         <!--        v-if="showEmoji && !isEditing"-->
-        <div  @click="_handleEmojiPicked('👎')" class="sc-user-input--button" style="cursor: pointer; margin-right: 10px;">
-          👎
-          </div>
+
         <div v-if="showFile && !isEditing" class="sc-user-input--button">
           <FileIcons :on-change="_handleFileSubmit" :color="colors.userInput.text" />
         </div>
@@ -45,6 +46,18 @@
         </div>
       </div>
     </form>
+    <div v-else class="sc-user-input sc-user-error"
+         :style="{
+            background: colors.errorInfo.bg,
+            color: colors.errorInfo.text
+         }">
+      <div>
+        Connection to the server lost (id {{error}});
+        <a class="reconnect-button" @click.native.prevent="reconnect">
+          Click here to reconnect
+        </a>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -55,11 +68,13 @@ import UserInputButton from './UserInputButton.vue'
 import Suggestions from './Suggestions.vue'
 import FileIcon from './assets/file.svg'
 import CloseIconSvg from './assets/close.svg'
-import store from './store/'
+import store, {mapState} from './store/'
 import IconCross from './components/icons/IconCross.vue'
 import IconOk from './components/icons/IconOk.vue'
 import IconSend from './components/icons/IconSend.vue'
 import {emitter} from "./event/index.js";
+import {ErrorTypes} from "../error.js";
+import {createSocketConnection} from "./socket/index.js";
 
 export default {
   components: {
@@ -70,6 +85,19 @@ export default {
     IconCross,
     IconOk,
     IconSend
+  },
+  setup () {
+    const { chatData } = mapState(['chatData']);
+
+    function reconnect () {
+      store.setState('loadedConnection', false)
+      store.setState('error', null)
+      createSocketConnection(chatData.value)
+    }
+    return {
+      ...mapState(['error']),
+      reconnect
+    }
   },
   props: {
     icons: {
@@ -119,6 +147,9 @@ export default {
     }
   },
   computed: {
+    ErrorTypes() {
+      return ErrorTypes
+    },
     editMessageId() {
       return this.isEditing && store.state.editMessage.id
     },
@@ -257,4 +288,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>

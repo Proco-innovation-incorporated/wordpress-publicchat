@@ -1,7 +1,8 @@
 import {ref} from "vue";
 import {closeSocketConnection} from "../store/index.js";
 import {emitter} from "../event/index.js";
-
+import {ErrorTypes} from "../../error.js";
+let socket;
 export const createSocketConnection = (params) => {
   const {
     access_token,
@@ -11,12 +12,22 @@ export const createSocketConnection = (params) => {
   } = params
 
   const tokens = ref({
-    access_token: import.meta.env.MODE === 'development' ? localStorage.getItem('access_token') || access_token : access_token,
-    refresh_token: import.meta.env.MODE === 'development' ? localStorage.getItem('refresh_token') || refresh_token : refresh_token
+    access_token: import.meta.env.MODE === 'development'
+      ? localStorage.getItem('access_token') || access_token
+      : access_token,
+    refresh_token: import.meta.env.MODE === 'development'
+      ? localStorage.getItem('refresh_token') || refresh_token
+      : refresh_token
   })
 
   const refresh = async () => {
+    if(!tokens.value.refresh_token) {
+      store.setState('error', 1000)
+      store.setState('loadedConnection', true)
+      throw new Error(ErrorTypes["1000"])
+    }
     try {
+      console.log(params, tokens.value)
       const result = await fetch(`${window.apiBaseUrl}/api/auth/token/refresh?refresh_token=${tokens.value.refresh_token}`)
         .then(i => i.json())
       if( import.meta.env.MODE === 'development' && result?.access_token && result?.refresh_token) {
@@ -24,12 +35,22 @@ export const createSocketConnection = (params) => {
         localStorage.setItem('refresh_token', result.refresh_token)
       }
 
+      if(!result?.access_token && !result?.refresh_token) {
+        store.setState('error', 1002)
+        store.setState('loadedConnection', true)
+        throw new Error(ErrorTypes["1002"])
+      }
+
       tokens.value = result;
     } catch (e) {
+      if(e === ErrorTypes["1002"]) return
+      store.setState('error', 1003)
       if( import.meta.env.MODE === 'development') {
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
       }
+      store.setState('loadedConnection', true)
+      throw new Error(ErrorTypes["1003"])
     }
   }
   const auth = async () => {
@@ -40,19 +61,24 @@ export const createSocketConnection = (params) => {
 
 
 
-  const createIntervalBeforeRefresh = (socket) => {
-    const interval = setInterval(async () => {
-      socket.close();
-      closeSocketConnection();
-      await refresh();
-      clearInterval(interval);
-      createConnection();
-    }, 1000 * 60 * 8)
-  }
+  // const createIntervalBeforeRefresh = (socket) => { will detele after test
+  //   const interval = setInterval(async () => {
+  //     socket.close();
+  //     closeSocketConnection();
+  //     await refresh();
+  //     clearInterval(interval);
+  //     createConnection();
+  //   }, 1000 * 60 * 8)
+  // }
 
 
   const createConnection = () => {
-    const socket = new WebSocket(
+    if(socket) {
+      socket.close()
+      socket = null;
+    }
+
+    socket = new WebSocket(
       `${window.apiBaseUrl}/api/livechat/in/${org_token}?token=${tokens.value.access_token}`
     );
 
@@ -77,23 +103,27 @@ export const createSocketConnection = (params) => {
 
     socket.onclose = function(event) {
       if (event.wasClean) {
+        store.setState('error', 1005)
         console.log(`[close] connection closed clearly, code=${event.code} message=${event.reason}`);
       } else {
         // например, сервер убил процесс или сеть недоступна
         // обычно в этом случае event.code 1006
+        store.setState('error', 1001)
         console.error('[close] connection closed dirty ', event.code, event.reason);
+        throw new Error(ErrorTypes["1001"])
       }
-
       // emitting new event so that the interface can update itself
-      emitter.$emit('connection-close');
-
+      emitter.$emit('connection-close')
     };
 
     socket.onerror = function(error) {
+      store.setState('error', 1004)
       console.error(`[error]`, error);
+      store.setState('loadedConnection', true)
+      throw new Error(ErrorTypes["1004"])
     };
 
-    createIntervalBeforeRefresh(socket)
+    // createIntervalBeforeRefresh(socket) //
     return socket;
   }
 
