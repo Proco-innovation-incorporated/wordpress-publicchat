@@ -1,7 +1,7 @@
 <template>
-  <div v-if="chatData">
+  <div v-shpw="chatData">
     <div
-      v-if="showLauncher"
+      v-show="showLauncher"
       class="sc-launcher"
       :class="{opened: isOpen}"
       :style="{backgroundColor:colors.launcher.bg}"
@@ -261,7 +261,7 @@ export default {
         setTimeout(() => {
           startSpinnerByName('showLauncher')
           createSocketConnection(value)
-        }, 0)
+        }, 0) 
       }
     })
     watch(loadedConnection, (value) => {
