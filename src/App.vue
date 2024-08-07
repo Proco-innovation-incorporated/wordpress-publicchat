@@ -151,10 +151,10 @@ export default {
             message,
             ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
           ]
+          this.newMessagesCount = this.newMessagesCount + 1
         } else {
-          this.messageListCopy = [
+          this.messageList = [
             ...this.messageList,
-            ...this.messageListCopy,
             message,
             ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
           ]
@@ -177,8 +177,6 @@ export default {
       this.isChatOpen = true;
       setTimeout(() => {
         this.$nextTick(() => {
-          this.messageList = this.messageListCopy;
-          this.messageListCopy = [];
           this.newMessagesCount = 0
         })
       }, 0)
