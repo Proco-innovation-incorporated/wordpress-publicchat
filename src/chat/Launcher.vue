@@ -1,5 +1,5 @@
 <template>
-  <div v-shpw="chatData">
+  <div v-show="chatData">
     <div
       v-show="showLauncher"
       class="sc-launcher"
