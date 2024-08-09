@@ -79,7 +79,7 @@ export const createSocketConnection = (params) => {
     }
 
     socket = new WebSocket(
-      `wss://channel.dev.ezeeassist.io/api/livechat/in/${org_token}?token=${tokens.value.access_token}`
+      `${window.apiBaseUrl}/api/livechat/in/${org_token}?token=${tokens.value.access_token}`
     );
 
     socket.onopen = function(e) {
