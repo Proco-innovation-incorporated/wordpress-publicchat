@@ -1,5 +1,5 @@
 <template>
-  <div class="sc-chat-window" :class="{opened: isOpen, closed: !isOpen}">
+  <div class="sc-chat-window" :class="{ opened: isOpen, closed: !isOpen }">
     <Header
       v-if="showHeader"
       :title="title"
@@ -11,7 +11,11 @@
         <slot name="header"> </slot>
       </template>
     </Header>
-    <UserList v-if="showUserList" :colors="colors" :participants="participants" />
+    <UserList
+      v-if="showUserList"
+      :colors="colors"
+      :participants="participants"
+    />
     <MessageList
       v-if="!showUserList"
       :messages="messages"
@@ -24,7 +28,12 @@
       @remove="$emit('remove', $event)"
     >
       <template v-slot:user-avatar="scopedProps">
-        <slot name="user-avatar" :user="scopedProps.user" :message="scopedProps.message"> </slot>
+        <slot
+          name="user-avatar"
+          :user="scopedProps.user"
+          :message="scopedProps.message"
+        >
+        </slot>
       </template>
       <template v-slot:text-message-body="scopedProps">
         <slot
@@ -40,7 +49,11 @@
         <slot name="system-message-body" :message="scopedProps.message"> </slot>
       </template>
       <template v-slot:text-message-toolbox="scopedProps">
-        <slot name="text-message-toolbox" :message="scopedProps.message" :me="scopedProps.me">
+        <slot
+          name="text-message-toolbox"
+          :message="scopedProps.message"
+          :me="scopedProps.me"
+        >
         </slot>
       </template>
     </MessageList>
@@ -55,103 +68,103 @@
       @onType="$emit('onType')"
       @edit="$emit('edit', $event)"
     />
-    <div :class="{'is-loaded': !isLoaded}"></div>
+    <div :class="{ 'is-loaded': !isLoaded }"></div>
   </div>
 </template>
 
 <script>
-import Header from './Header.vue'
-import MessageList from './MessageList.vue'
-import UserInput from './UserInput.vue'
-import UserList from './UserList.vue'
+import Header from "./Header.vue";
+import MessageList from "./MessageList.vue";
+import UserInput from "./UserInput.vue";
+import UserList from "./UserList.vue";
 
 export default {
   components: {
     Header,
     MessageList,
     UserInput,
-    UserList
+    UserList,
   },
   props: {
     showEmoji: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showFile: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showHeader: {
       type: Boolean,
-      default: true
+      default: true,
     },
     isLoaded: {
       type: Boolean,
-      default: true
+      default: true,
     },
     participants: {
       type: Array,
-      required: true
+      required: true,
     },
     title: {
       type: String,
-      required: true
+      required: true,
     },
     onUserInputSubmit: {
       type: Function,
-      required: true
+      required: true,
     },
     messageList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     isOpen: {
       type: Boolean,
-      default: () => false
+      default: () => false,
     },
     placeholder: {
       type: String,
-      required: true
+      required: true,
     },
     showTypingIndicator: {
       type: String,
-      required: true
+      required: true,
     },
     colors: {
       type: Object,
-      required: true
+      required: true,
     },
     alwaysScrollToBottom: {
       type: Boolean,
-      required: true
+      required: true,
     },
     messageStyling: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      showUserList: false
-    }
+      showUserList: false,
+    };
   },
   computed: {
     messages() {
-      let messages = this.messageList
-
-      return messages
-    }
+      let messages = this.messageList;
+      return messages;
+    },
   },
   methods: {
     handleUserListToggle(showUserList) {
-      this.showUserList = showUserList
+      this.showUserList = showUserList;
     },
     getSuggestions() {
-      return this.messages.length > 0 ? this.messages[this.messages.length - 1].suggestions : []
-    }
-  }
-}
+      return this.messages.length > 0
+        ? this.messages[this.messages.length - 1].suggestions
+        : [];
+    },
+  },
+};
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

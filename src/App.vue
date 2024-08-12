@@ -1,52 +1,84 @@
 <template>
-  <BubbleChat :always-scroll-to-bottom="alwaysScrollToBottom" :close="closeChat" :colors="colors" :is-open="isChatOpen"
-    :message-list="messageList" :message-styling="messageStyling" :new-messages-count="newMessagesCount"
-    :on-message-was-sent="onMessageWasSent" :open="openChat" :participants="participants" :show-close-button="true"
-    :show-launcher="true" :show-emoji="false" :show-file="false" :show-typing-indicator="showTypingIndicator"
-    :show-edition="true" :show-deletion="true" :title="botTitle" :title-image-url="titleImageUrl"
-    :disable-user-list-toggle="false" @onType="handleOnType" @edit="editMessage" @remove="removeMessage">
+  <BubbleChat
+    :always-scroll-to-bottom="alwaysScrollToBottom"
+    :close="closeChat"
+    :colors="colors"
+    :is-open="isChatOpen"
+    :message-list="messageList"
+    :message-styling="messageStyling"
+    :new-messages-count="newMessagesCount"
+    :on-message-was-sent="onMessageWasSent"
+    :open="openChat"
+    :participants="participants"
+    :show-close-button="true"
+    :show-launcher="true"
+    :show-emoji="false"
+    :show-file="false"
+    :show-typing-indicator="showTypingIndicator"
+    :show-edition="true"
+    :show-deletion="true"
+    :title="botTitle"
+    :title-image-url="titleImageUrl"
+    :disable-user-list-toggle="false"
+    @onType="handleOnType"
+    @edit="editMessage"
+    @remove="removeMessage"
+  >
     <template v-slot:text-message-toolbox="scopedProps">
-      <button v-if="!scopedProps.me && scopedProps.message.type === 'text'"
-        @click.prevent="like(scopedProps.message.id)">
+      <button
+        v-if="!scopedProps.me && scopedProps.message.type === 'text'"
+        @click.prevent="like(scopedProps.message.id)"
+      >
         👍
       </button>
     </template>
     <template v-slot:text-message-body="scopedProps">
-      <p class="sc-message--text-content" v-html="scopedProps.message.data.text"></p>
-      <p v-if="scopedProps.message.data.meta" class="sc-message--meta"
-        :style="{ color: scopedProps.messageColors.color }">
+      <p
+        class="sc-message--text-content"
+        v-html="scopedProps.message.data.text"
+      ></p>
+      <p
+        v-if="scopedProps.message.data.meta"
+        class="sc-message--meta"
+        :style="{ color: scopedProps.messageColors.color }"
+      >
         {{ scopedProps.message.data.meta }}
       </p>
-      <p v-if="scopedProps.message.isEdited || scopedProps.message.liked" class="sc-message--edited">
+      <p
+        v-if="scopedProps.message.isEdited || scopedProps.message.liked"
+        class="sc-message--edited"
+      >
         <template v-if="scopedProps.message.isEdited">✎</template>
         <template v-if="scopedProps.message.liked">👍</template>
       </p>
     </template>
-    <template v-slot:system-message-body="{message}"> [System]: {{ message.text }} </template>
+    <template v-slot:system-message-body="{ message }">
+      [System]: {{ message.text }}
+    </template>
   </BubbleChat>
 </template>
 
 <script>
 import messageHistory from "./messageHistory.js";
-import chatParticipants from './chatProfiles'
-import availableColors from './colors'
+import chatParticipants from "./chatProfiles";
+import availableColors from "./colors";
 import { emitter } from "./chat/event/index.js";
-import {mapState, sendSocketMessage} from "./chat/store/index.js";
-import * as emoji from 'node-emoji';
+import { mapState, sendSocketMessage } from "./chat/store/index.js";
+import * as emoji from "node-emoji";
 
 function getMediaMessage(author, id, file) {
   return {
-    type: 'file',
+    type: "file",
     author: author,
     id: id + Math.random(),
-      data: {
+    data: {
       // text: `What about this one instead?? `,
       file: {
-        url: file
+        url: file,
       },
       // meta: '✓✓ Read'
-    }
-  }
+    },
+  };
 }
 function tryToGetMediaFromMessage(message) {
   const imageRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/gi;
@@ -55,29 +87,28 @@ function tryToGetMediaFromMessage(message) {
   const imageLinks = message.data.text.match(imageRegex);
   const fileLinks = message.data.text.match(fileRegex);
 
-  const listOfArray = [
-    ...(imageLinks || []),
-    ...(fileLinks || [])
-  ];
+  const listOfArray = [...(imageLinks || []), ...(fileLinks || [])];
 
-  return listOfArray.map(item => {
+  return listOfArray.map((item) => {
     return getMediaMessage(message.author, message.message, item);
-  })
+  });
 }
 
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
       botTitle: window.botTitle || "EzeeAssist Helper",
-      titleImageUrl: window.pluginPath + '/bot-logo.png',
-      messageList: messageHistory.map(item => {
-        const countOfPArsed = tryToGetMediaFromMessage(item)
-        return countOfPArsed.length ? [item].concat(countOfPArsed) : [item]
-      }).flat(),
+      titleImageUrl: window.pluginPath + "/bot-logo.png",
+      messageList: messageHistory
+        .map((item) => {
+          const countOfPArsed = tryToGetMediaFromMessage(item);
+          return countOfPArsed.length ? [item].concat(countOfPArsed) : [item];
+        })
+        .flat(),
       newMessagesCount: 0,
       isChatOpen: false,
-      showTypingIndicator: '',
+      showTypingIndicator: "",
       colors: null,
       availableColors,
       chosenColor: null,
@@ -85,145 +116,163 @@ export default {
       messageStyling: true,
       userIsTyping: false,
       types: {
-        'user': 'me',
-        'bot': 'bot'
+        user: "me",
+        bot: "bot",
       },
-      messageListCopy: []
-    }
+      messageListCopy: [],
+    };
   },
   computed: {
     linkColor() {
-      return this.chosenColor === 'dark' ? this.colors.sentMessage.text : this.colors.launcher.bg
+      return this.chosenColor === "dark"
+        ? this.colors.sentMessage.text
+        : this.colors.launcher.bg;
     },
     backgroundColor() {
-      return this.chosenColor === 'dark' ? this.colors.messageList.bg : '#fff'
+      return this.chosenColor === "dark" ? this.colors.messageList.bg : "#fff";
     },
     participants() {
-      return chatParticipants.value
+      return chatParticipants.value;
     },
-    ...mapState(['error'])
+    ...mapState(["error"]),
   },
   watch: {
     error(value) {
-      if(!value) {
-        this.messageList = []
+      if (!value) {
+        this.messageList = [];
       }
-    }
+    },
   },
   created() {
-    this.setColor('blue')
+    this.setColor("blue");
   },
   mounted() {
-    emitter.$on('onmessage', (event) => {
-      if(Array.isArray(event)) {
-        event.forEach(item => {
-          Array.isArray(item) ? item.forEach(nested => this.handleItemSocketAnswer(nested)): this.handleItemSocketAnswer(item)
-        })
+    emitter.$on("onmessage", (event) => {
+      if (Array.isArray(event)) {
+        event.forEach((item) => {
+          Array.isArray(item)
+            ? item.forEach((nested) => this.handleItemSocketAnswer(nested))
+            : this.handleItemSocketAnswer(item);
+        });
+
+        if (event.length == 1 && event[0].msg_type == "bot" && !this.isChatOpen) {
+          this.newMessagesCount = this.newMessagesCount + 1;
+        }
       } else {
-        this.handleItemSocketAnswer(event)
+        this.handleItemSocketAnswer(event);
       }
-    })
-    this.messageList.forEach((x) => (x.liked = false))
+    });
+    this.messageList.forEach((x) => (x.liked = false));
   },
   methods: {
     handleItemSocketAnswer(event) {
-      if(event.msg_type === 'system' && !event.success) {
-        Object.assign({}, {
-          type: 'system',
-          data: {
-            text: event.response
+      if (event.msg_type === "system" && !event.success) {
+        Object.assign(
+          {},
+          {
+            type: "system",
+            data: {
+              text: event.response,
+            },
+            author: `bot`,
           },
-          author: `bot`
-        }, {id: event.id})
+          { id: event.id }
+        );
         this.showTypingIndicator = false;
       }
-      if(!event.msg_type || this.types[event.msg_type]) {
-        const message = Object.assign({}, {
-          type: 'text',
-          data: {
-            text: event.response
+      if (!event.msg_type || this.types[event.msg_type]) {
+        const message = Object.assign(
+          {},
+          {
+            type: "text",
+            data: {
+              text: event.response,
+            },
+            author: this.types[event.msg_type] || `bot`,
           },
-          author: this.types[event.msg_type] || `bot`
-        }, {id: event.id})
-        if(this.isChatOpen) {
+          { id: event.id }
+        );
+        if (this.isChatOpen) {
           this.messageList = [
             ...this.messageList,
             message,
-            ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
-          ]
+            ...(event.media_urls?.map((i) =>
+              getMediaMessage(`bot`, event.id, i.url)
+            ) || []),
+          ];
         } else {
-          this.messageListCopy = [
+          this.messageList = [
             ...this.messageList,
-            ...this.messageListCopy,
             message,
-            ...(event.media_urls?.map((i) => getMediaMessage(`bot`, event.id, i.url)) || [])
-          ]
+            ...(event.media_urls?.map((i) =>
+              getMediaMessage(`bot`, event.id, i.url)
+            ) || []),
+          ];
         }
         this.showTypingIndicator = false;
       }
     },
     onMessageWasSent(message) {
-
-      if(message.type === 'emoji') {
+      if (message.type === "emoji") {
         const obj = emoji.which(message.data.emoji);
-        sendSocketMessage(obj)
+        sendSocketMessage(obj);
       } else {
-        sendSocketMessage(message.data.text)
+        sendSocketMessage(message.data.text);
       }
       this.showTypingIndicator = true;
-      this.messageList = [...this.messageList, Object.assign({}, message, {id: Math.random()})]
+      this.messageList = [
+        ...this.messageList,
+        Object.assign({}, message, { id: Math.random() }),
+      ];
     },
     openChat() {
       this.isChatOpen = true;
       setTimeout(() => {
         this.$nextTick(() => {
-          this.messageList = this.messageListCopy;
-          this.messageListCopy = [];
-          this.newMessagesCount = 0
-        })
-      }, 0)
+          this.newMessagesCount = 0;
+        });
+      }, 0);
     },
     closeChat() {
-      this.isChatOpen = false
+      this.isChatOpen = false;
     },
     setColor(color) {
-      this.colors = this.availableColors[color]
-      this.chosenColor = color
+      this.colors = this.availableColors[color];
+      this.chosenColor = color;
     },
     showStylingInfo() {
-      this.$modal.show('dialog', {
-        title: 'Info',
-        text:
-          'You can use *word* to <strong>boldify</strong>, /word/ to <em>emphasize</em>, _word_ to <u>underline</u>, `code` to <code>write = code;</code>, ~this~ to <del>delete</del> and ^sup^ or ¡sub¡ to write <sup>sup</sup> and <sub>sub</sub>'
-      })
+      this.$modal.show("dialog", {
+        title: "Info",
+        text: "You can use *word* to <strong>boldify</strong>, /word/ to <em>emphasize</em>, _word_ to <u>underline</u>, `code` to <code>write = code;</code>, ~this~ to <del>delete</del> and ^sup^ or ¡sub¡ to write <sup>sup</sup> and <sub>sub</sub>",
+      });
     },
     messageStylingToggled(e) {
-      this.messageStyling = e.target.checked
+      this.messageStyling = e.target.checked;
     },
     handleOnType() {
-      emitter.$emit('onType')
-      this.userIsTyping = true
+      emitter.$emit("onType");
+      this.userIsTyping = true;
     },
     editMessage(message) {
-      const m = this.messageList.find((m) => m.id === message.id)
-      m.isEdited = true
-      m.data.text = message.data.text
+      const m = this.messageList.find((m) => m.id === message.id);
+      m.isEdited = true;
+      m.data.text = message.data.text;
     },
     removeMessage(message) {
-      if (confirm('Delete?')) {
-        const m = this.messageList.find((m) => m.id === message.id)
-        m.type = 'system'
-        m.data.text = 'This message has been removed'
+      if (confirm("Delete?")) {
+        const m = this.messageList.find((m) => m.id === message.id);
+        m.type = "system";
+        m.data.text = "This message has been removed";
       }
     },
     like(id) {
-      const m = this.messageList.findIndex((m) => m.id === id)
-      var msg = this.messageList[m]
-      msg.liked = !msg.liked
-      this.$set(this.messageList, m, msg)
-    }
-  }
-}
+      const m = this.messageList.findIndex((m) => m.id === id);
+      var msg = this.messageList[m];
+      msg.liked = !msg.liked;
+      this.$set(this.messageList, m, msg);
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -296,11 +345,10 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   a:hover {
-    color: #0E142CFF;
+    color: #0e142cff;
   }
   button {
     background-color: #f9f9f9;
   }
 }
-
 </style>
