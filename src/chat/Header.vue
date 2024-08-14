@@ -1,7 +1,7 @@
 <template>
   <div class="sc-header" :style="{background: colors.header.bg, color: colors.header.text}">
     <img v-if="titleImageUrl" class="sc-header--img" :src="titleImageUrl" height="60px" alt="" />
-    <div v-if="!disableUserListToggle" class="sc-header--title" @click="toggleUserList">
+    <div v-if="!disableUserListToggle" class="sc-header--title">
       {{ title }}
     </div>
     <div v-else class="sc-header--title">{{ title }}</div>

@@ -9,7 +9,6 @@
     :new-messages-count="newMessagesCount"
     :on-message-was-sent="onMessageWasSent"
     :open="openChat"
-    :participants="participants"
     :show-close-button="true"
     :show-launcher="true"
     :show-emoji="false"
@@ -59,8 +58,6 @@
 </template>
 
 <script>
-import messageHistory from "./messageHistory.js";
-import chatParticipants from "./chatProfiles";
 import availableColors from "./colors";
 import { emitter } from "./chat/event/index.js";
 import { mapState, sendSocketMessage } from "./chat/store/index.js";
@@ -100,12 +97,7 @@ export default {
     return {
       botTitle: window.botTitle || "EzeeAssist Helper",
       titleImageUrl: window.pluginPath + "/bot-logo.png",
-      messageList: messageHistory
-        .map((item) => {
-          const countOfPArsed = tryToGetMediaFromMessage(item);
-          return countOfPArsed.length ? [item].concat(countOfPArsed) : [item];
-        })
-        .flat(),
+      messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,
       showTypingIndicator: "",
@@ -130,9 +122,6 @@ export default {
     },
     backgroundColor() {
       return this.chosenColor === "dark" ? this.colors.messageList.bg : "#fff";
-    },
-    participants() {
-      return chatParticipants.value;
     },
     ...mapState(["error"]),
   },
