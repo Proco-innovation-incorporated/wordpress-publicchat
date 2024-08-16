@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && mv dist/assets/index-*.js chat-plugin/assets/js/widget-app.js && mv dist/assets/index-*.css chat-plugin/assets/css/widget-style.css",
+    "build:dev": "./build.sh --mode dev",
+    "build:prod": "./build.sh --mode prod",
     "preview": "vite preview",
     "vue-tsc": "vue-tsc"
   },
