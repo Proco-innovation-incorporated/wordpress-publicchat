@@ -21,3 +21,5 @@ made with Vue 3 + TypeScript + Vite
  - `npm run build:MODE` will find API urls in files: `chat-plugin/chat-plugin.php` and 
     `chat-plugin/assets/js/application-exec.js`
     and change it to *https://channel.dev.ezeeassist.io* for dev and *https://channel.prod.ezeeassist.io* for prod
+
+ *MODE* options: `dev`, `prod`
