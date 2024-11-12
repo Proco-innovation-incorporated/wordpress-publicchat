@@ -97,11 +97,16 @@ export default {
     this.$nextTick(this._scrollDown());
   },
   updated() {
-    if (this.shouldScrollToBottom()) this.$nextTick(this._scrollDown());
+    if (this.shouldScrollToBottom()) this.$nextTick(this._scrollDown(true));
   },
   methods: {
-    _scrollDown() {
-      this.$refs.scrollList.scrollTop = this.$refs.scrollList.scrollHeight;
+    _scrollDown(isSmooth = false) {
+      setTimeout(() => {
+        this.$refs.scrollList.scrollTo({
+          top: this.$refs.scrollList.scrollHeight,
+          behavior: isSmooth ? "smooth" : undefined,
+        });
+      }, 10);
     },
     handleScroll(e) {
       if (e.target.scrollTop === 0) {

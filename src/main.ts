@@ -11,6 +11,7 @@ declare const window: any;
 (function (){
   window.pluginPath = import.meta.env.MODE === 'development' ? '' : '/wp-content/plugins/chat-plugin/assets';
   window.apiBaseUrl = import.meta.env.MODE === 'development' ? import.meta.env.VITE_API_BASE_URL : '';
+  window.wsBaseUrl = import.meta.env.MODE === 'development' ? import.meta.env.VITE_WS_BASE_URL : '';
   // before new build, make sure the title is correct
   window.botTitle = 'WSI AI Assistant';
   

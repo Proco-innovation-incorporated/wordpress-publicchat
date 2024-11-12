@@ -1,80 +1,172 @@
 <template>
   <div>
-    <Suggestions :suggestions="suggestions" :colors="colors" @sendSuggestion="_submitSuggestion" />
-    <div v-if="file" class="file-container" :style="{
-        backgroundColor: colors.userInput.text,
-        color: colors.userInput.bg
-    }">
-      <span class="icon-file-message"><img :src="icons.file.img" :alt="icons.file.name" height="15" /></span>
-      {{ file.name }}
-      <span class="delete-file-message" @click="cancelFile()"><img :src="icons.closeSvg.img" :alt="icons.closeSvg.name"
-          height="10" title="Remove the file" /></span>
-    </div>
-    <form class="sc-user-input" :class="{ active: inputActive }" v-if="!error" :style="{ background: colors.userInput.bg }">
-      <div ref="userInput" role="button" tabIndex="0" contentEditable="true" :placeholder="placeholder"
-        class="sc-user-input--text" :style="{ color: colors.userInput.text }" @focus="setInputActive(true)"
-        @blur="setInputActive(false)" @keydown="handleKey" @focusUserInput="focusUserInput()"></div>
-      <div class="sc-user-input--buttons" >
-        <div v-if="showEmoji && !isEditing" class="sc-user-input--button">
-          <EmojiIcon :on-emoji-picked="_handleEmojiPicked" :color="colors.userInput.text" />
+    <Suggestions
+      :suggestions="suggestions"
+      :colors="colors"
+      @sendSuggestion="_submitSuggestion"
+    />
+    <form
+      class="sc-user-input"
+      :class="{ active: inputActive }"
+      v-if="!error"
+      :style="{ background: colors.userInput.bg }"
+    >
+      <div
+        ref="userInput"
+        role="button"
+        tabIndex="0"
+        contentEditable="true"
+        :placeholder="placeholder"
+        class="sc-user-input--text"
+        :style="{ color: colors.userInput.text }"
+        @focus="setInputActive(true)"
+        @blur="setInputActive(false)"
+        @keydown="handleKey"
+        @focusUserInput="focusUserInput()"
+      ></div>
+      <div class="sc-user-input--buttons">
+        <div
+          v-if="showEmoji && !isEditing && !isMessageSending"
+          class="sc-user-input--button"
+        >
+          <EmojiIcon
+            :on-emoji-picked="_handleEmojiPicked"
+            :color="colors.userInput.text"
+          />
         </div>
-<!--        v-if="showEmoji && !isEditing"-->
-        <div  @click="_handleEmojiPicked('👎')" class="sc-user-input--button" style="cursor: pointer; margin-right: 10px;">
+        <!--        v-if="showEmoji && !isEditing"-->
+        <div
+          v-if="!isMessageSending"
+          @click="_handleEmojiPicked('👎')"
+          class="sc-user-input--button"
+          style="cursor: pointer; margin-right: 10px"
+        >
           👎
         </div>
-        <div  @click="_handleEmojiPicked('👍')" class="sc-user-input--button" style="cursor: pointer; margin-right: 10px;">
+        <div
+          v-if="!isMessageSending"
+          @click="_handleEmojiPicked('👍')"
+          class="sc-user-input--button"
+          style="cursor: pointer; margin-right: 10px"
+        >
           👍
         </div>
         <!--        v-if="showEmoji && !isEditing"-->
 
-        <div v-if="showFile && !isEditing" class="sc-user-input--button">
-          <FileIcons :on-change="_handleFileSubmit" :color="colors.userInput.text" />
+        <div
+          v-if="showFile && !isEditing && !isMessageSending"
+          class="sc-user-input--button"
+        >
+          <FileIcons
+            :on-change="_handleFileSubmit"
+            :color="colors.userInput.text"
+          />
         </div>
         <div v-if="isEditing" class="sc-user-input--button">
-          <UserInputButton :color="colors.userInput.text" tooltip="Cancel" @click.native.prevent="_editFinish">
+          <UserInputButton
+            :color="colors.userInput.text"
+            tooltip="Cancel"
+            @click.native.prevent="_editFinish"
+          >
             <IconCross />
           </UserInputButton>
         </div>
         <div class="sc-user-input--button">
-          <UserInputButton v-if="isEditing" :color="colors.userInput.text" tooltip="Edit"
-            @click.native.prevent="_editText">
+          <UserInputButton
+            v-if="isEditing"
+            :color="colors.userInput.text"
+            tooltip="Edit"
+            @click.native.prevent="_editText"
+          >
             <IconOk />
           </UserInputButton>
-          <UserInputButton v-else :color="colors.userInput.text" tooltip="Send" @click.native.prevent="_submitText">
-            <IconSend />
-          </UserInputButton>
+
+          <div v-else style="position: relative">
+            <UserInputButton
+              v-if="!isMessageSending"
+              :color="colors.userInput.text"
+              tooltip="Send"
+              @click.native.prevent="_submitText"
+            >
+              <IconSend />
+            </UserInputButton>
+            <Loader
+              class="sc-user-inpu--loader"
+              :isLoading="isMessageSending"
+            ></Loader>
+          </div>
         </div>
       </div>
     </form>
-    <div v-else class="sc-user-input sc-user-error"
-         :style="{
-            background: colors.errorInfo.bg,
-            color: colors.errorInfo.text
-         }">
+    <div
+      v-else
+      class="sc-user-input sc-user-error"
+      :style="{
+        background: colors.errorInfo.bg,
+        color: colors.errorInfo.text,
+      }"
+    >
       <div>
-        Connection to the server lost (id {{error}});
+        Connection to the server lost (id {{ error }});
         <a class="reconnect-button" @click.native.prevent="reconnect">
           Click here to reconnect
         </a>
       </div>
     </div>
   </div>
+  <div v-if="files.length" class="files-container">
+    <!-- <span class="icon-file-message"
+      ><img :src="icons.file.img" :alt="icons.file.name" height="15"
+    /></span> -->
+    <!-- {{ file.name }} -->
+
+    <div v-for="file in files" class="file">
+      <IconDeleteAttachment
+        v-if="!isMessageSending"
+        class="delete-file-button"
+        @click.prevent.stop="removeFileAttachment(file)"
+      />
+
+      <img
+        v-if="fileImageTypes.includes(file.type)"
+        class="file-image"
+        :src="file.url"
+        alt=""
+      />
+      <div v-else class="file-default">
+        <img
+          src="https://cdn-icons-png.flaticon.com/128/2258/2258853.png"
+          alt=""
+        />
+        <div>
+          <div class="file-name" style="font-size: 12px">
+            {{ file.name }}
+          </div>
+          <div class="file-extention" style="font-size: 12px">
+            {{ file.name.substring(file.name.lastIndexOf(".") + 1) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import EmojiIcon from './icons/EmojiIcon.vue'
-import FileIcons from './icons/FileIcons.vue'
-import UserInputButton from './UserInputButton.vue'
-import Suggestions from './Suggestions.vue'
-import FileIcon from './assets/file.svg'
-import CloseIconSvg from './assets/close.svg'
-import store, {mapState} from './store/'
-import IconCross from './components/icons/IconCross.vue'
-import IconOk from './components/icons/IconOk.vue'
-import IconSend from './components/icons/IconSend.vue'
-import {emitter} from "./event/index.js";
-import {ErrorTypes} from "../error.js";
-import {createSocketConnection} from "./socket/index.js";
+import EmojiIcon from "./icons/EmojiIcon.vue";
+import Loader from "./loading-worker/Loader.vue";
+import FileIcons from "./icons/FileIcons.vue";
+import UserInputButton from "./UserInputButton.vue";
+import Suggestions from "./Suggestions.vue";
+import FileIcon from "./assets/file.svg";
+import CloseIconSvg from "./assets/close.svg";
+import store, { mapState } from "./store/";
+import IconCross from "./components/icons/IconCross.vue";
+import IconOk from "./components/icons/IconOk.vue";
+import IconDeleteAttachment from "./components/icons/IconDeleteAttachment.vue";
+import IconSend from "./components/icons/IconSend.vue";
+import { emitter } from "./event/index.js";
+import { ErrorTypes } from "../error.js";
+import { createSocketConnection } from "./socket/index.js";
 
 export default {
   components: {
@@ -82,22 +174,25 @@ export default {
     FileIcons,
     UserInputButton,
     Suggestions,
+    IconDeleteAttachment,
     IconCross,
     IconOk,
-    IconSend
+    IconSend,
+    Loader,
   },
-  setup () {
-    const { chatData } = mapState(['chatData']);
+  setup() {
+    const { chatData } = mapState(["chatData"]);
 
-    function reconnect () {
-      store.setState('loadedConnection', false)
-      store.setState('error', null)
-      createSocketConnection(chatData.value)
+    function reconnect() {
+      store.setState("loadedConnection", false);
+      store.setState("error", null);
+      createSocketConnection(chatData.value);
     }
+
     return {
-      ...mapState(['error']),
-      reconnect
-    }
+      ...mapState(["error"]),
+      reconnect,
+    };
   },
   props: {
     icons: {
@@ -106,134 +201,145 @@ export default {
         return {
           file: {
             img: FileIcon,
-            name: 'default'
+            name: "default",
           },
           closeSvg: {
             img: CloseIconSvg,
-            name: 'default'
-          }
-        }
-      }
+            name: "default",
+          },
+        };
+      },
     },
     showEmoji: {
       type: Boolean,
-      default: () => false
+      default: () => false,
     },
     suggestions: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     showFile: {
       type: Boolean,
-      default: () => false
+      default: () => false,
     },
     onSubmit: {
       type: Function,
-      required: true
+      required: true,
     },
     placeholder: {
       type: String,
-      default: 'Write something...'
+      default: "Write something...",
     },
     colors: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
+      files: [],
       file: null,
-      inputActive: false
-    }
+      inputActive: false,
+      fileImageTypes: ["image/png", "image/jpeg", "image/jpg"],
+      presignedFilesData: [],
+      isMessageSending: false,
+    };
   },
   computed: {
     ErrorTypes() {
-      return ErrorTypes
+      return ErrorTypes;
     },
     editMessageId() {
-      return this.isEditing && store.state.editMessage.id
+      return this.isEditing && store.state.editMessage.id;
     },
     isEditing() {
-      return store.state.editMessage && store.state.editMessage.id
-    }
+      return store.state.editMessage && store.state.editMessage.id;
+    },
   },
   watch: {
     editMessageId(m) {
-      if (store.state.editMessage != null && store.state.editMessage != undefined) {
-        this.$refs.userInput.focus()
-        this.$refs.userInput.textContent = store.state.editMessage.data.text
+      if (
+        store.state.editMessage != null &&
+        store.state.editMessage != undefined
+      ) {
+        this.$refs.userInput.focus();
+        this.$refs.userInput.textContent = store.state.editMessage.data.text;
       } else {
-        this.$refs.userInput.textContent = ''
+        this.$refs.userInput.textContent = "";
       }
-    }
+    },
   },
   mounted() {
-    emitter.$on('focusUserInput', () => {
+    emitter.$on("focusUserInput", () => {
       if (this.$refs.userInput) {
-        this.focusUserInput()
+        this.focusUserInput();
       }
-    })
+    });
   },
   methods: {
     cancelFile() {
-      this.file = null
+      this.file = null;
     },
     setInputActive(onoff) {
-      this.inputActive = onoff
+      this.inputActive = onoff;
     },
     handleKey(event) {
       if (event.keyCode === 13 && !event.shiftKey) {
         if (!this.isEditing) {
-          this._submitText(event)
+          this._submitText(event);
         } else {
-          this._editText(event)
+          this._editText(event);
         }
-        this._editFinish()
-        event.preventDefault()
+        this._editFinish();
+        event.preventDefault();
       } else if (event.keyCode === 27) {
-        this._editFinish()
-        event.preventDefault()
+        this._editFinish();
+        event.preventDefault();
       }
 
-      this.$emit('onType')
+      this.$emit("onType");
     },
     focusUserInput() {
       this.$nextTick(() => {
-        this.$refs.userInput.focus()
-      })
+        this.$refs.userInput.focus();
+      });
     },
     _submitSuggestion(suggestion) {
-      this.onSubmit({author: 'me', type: 'text', data: {text: suggestion}})
+      this.onSubmit({ author: "me", type: "text", data: { text: suggestion } });
     },
     _checkSubmitSuccess(success) {
+      this.isMessageSending = true;
       if (Promise !== undefined) {
         Promise.resolve(success).then(
           function (wasSuccessful) {
             if (wasSuccessful === undefined || wasSuccessful) {
-              this.file = null
-              this.$refs.userInput.innerHTML = ''
+              this.files = [];
+              this.$refs.userInput.innerHTML = "";
+              this.isMessageSending = false;
             }
           }.bind(this)
-        )
+        );
       } else {
-        this.file = null
-        this.$refs.userInput.innerHTML = ''
+        this.$refs.userInput.innerHTML = "";
+        this.files = [];
+        this.isMessageSending = false;
       }
     },
     _submitText(event) {
-      const text = this.$refs.userInput.textContent
-      const file = this.file
+      const text = this.$refs.userInput.textContent;
+      const file = this.file;
       if (file) {
-        this._submitTextWhenFile(event, text, file)
+        this._submitTextWhenFile(event, text, file);
       } else {
         if (text && text.length > 0) {
           this._checkSubmitSuccess(
             this.onSubmit({
-              author: 'me',
-              type: 'text',
-              data: {text}
+              author: "me",
+              type: "text",
+              data: { text },
+              files: this.files,
             })
-          )
+          );
         }
       }
     },
@@ -241,52 +347,52 @@ export default {
       if (text && text.length > 0) {
         this._checkSubmitSuccess(
           this.onSubmit({
-            author: 'me',
-            type: 'file',
-            data: {text, file}
+            author: "me",
+            type: "file",
+            data: { text, file },
           })
-        )
+        );
       } else {
         this._checkSubmitSuccess(
           this.onSubmit({
-            author: 'me',
-            type: 'file',
-            data: {file}
+            author: "me",
+            type: "file",
+            data: { file },
           })
-        )
+        );
       }
     },
     _editText(event) {
-      const text = this.$refs.userInput.textContent
+      const text = this.$refs.userInput.textContent;
       if (text && text.length) {
-        this.$emit('edit', {
-          author: 'me',
-          type: 'text',
+        this.$emit("edit", {
+          author: "me",
+          type: "text",
           id: store.state.editMessage.id,
-          data: {text}
-        })
-        this._editFinish()
+          data: { text },
+        });
+        this._editFinish();
       }
     },
     _handleEmojiPicked(emoji) {
       this._checkSubmitSuccess(
         this.onSubmit({
-          author: 'me',
-          type: 'emoji',
-          data: {emoji}
+          author: "me",
+          type: "emoji",
+          data: { emoji },
         })
-      )
+      );
     },
-    _handleFileSubmit(file) {
-      this.file = file
+    async _handleFileSubmit(files) {
+      this.files = this.files.concat(files);
     },
     _editFinish() {
-      store.setState('editMessage', null)
-    }
-  }
-}
+      store.setState("editMessage", null);
+    },
+
+    removeFileAttachment(file) {
+      this.files.splice(this.files.indexOf(file), 1);
+    },
+  },
+};
 </script>
-
-<style scoped>
-
-</style>

@@ -17,7 +17,8 @@
       :participants="participants"
     />
     <MessageList
-      v-if="!showUserList"
+      v-if="!showUserList && isOpen"
+      ref="messagesList"
       :messages="messages"
       :participants="participants"
       :show-typing-indicator="showTypingIndicator"
@@ -142,6 +143,12 @@ export default {
       type: Boolean,
       required: true,
     },
+  },
+  watch: {
+    // Watch the 'message' prop
+    // isOpen(newVal, oldVal) {
+    //   this.$refs.messagesList._scrollDown();
+    // },
   },
   data() {
     return {

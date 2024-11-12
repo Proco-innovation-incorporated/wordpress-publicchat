@@ -3,58 +3,60 @@
  * and instantiated externally
  **/
 
-
-
-import {computed, ref} from "vue";
+import { computed, ref } from "vue";
 
 const store = {
   state: ref({
     editMessage: null,
     loadedConnection: false,
-    error: null
+    error: null,
+    isMessageSending: true,
   }),
   socket: null,
   setSocket(socket, userId) {
     this.socket = socket;
-    this.socket.userId= userId;
+    this.socket.userId = userId;
   },
   setupFirst: () => {
     store.state = ref({
-      editMessage: null
-    })
+      editMessage: null,
+    });
   },
 
   setState(key, val) {
     this.state.value = {
       ...this.state.value,
-      [key]: val
-    }
-  }
-}
+      [key]: val,
+    };
+  },
+};
 
 function mapState(keys) {
-  const map = {}
+  const map = {};
   keys.forEach((key) => {
     map[key] = computed(() => {
-      return store.state.value[key]
-    })
-  })
-  return map
+      return store.state.value[key];
+    });
+  });
+  return map;
 }
 
-function sendSocketMessage (message) {
-  if(store.socket) {
-    store.socket.send(JSON.stringify({
-      version: 'v1',
-      message: message,
-      userid: store.socket.userId
-    }));
+function sendSocketMessage(message, attachments = []) {
+  if (store.socket) {
+    store.socket.send(
+      JSON.stringify({
+        version: "v1",
+        message: message,
+        userid: store.socket.userId,
+        attachments: attachments,
+      })
+    );
   }
 }
 
-function closeSocketConnection () {
+function closeSocketConnection() {
   store.socket = null;
 }
-window.store = store
-export default store
-export {mapState, sendSocketMessage, closeSocketConnection}
+window.store = store;
+export default store;
+export { mapState, sendSocketMessage, closeSocketConnection };

@@ -12,13 +12,13 @@
     :show-close-button="true"
     :show-launcher="true"
     :show-emoji="false"
-    :show-file="false"
+    :show-file="showFile"
     :show-typing-indicator="showTypingIndicator"
     :show-edition="true"
     :show-deletion="true"
     :title="botTitle"
     :title-image-url="titleImageUrl"
-    :disable-user-list-toggle="false"
+    :disable-user-list-toggle="true"
     @onType="handleOnType"
     @edit="editMessage"
     @remove="removeMessage"
@@ -60,7 +60,7 @@
 <script>
 import availableColors from "./colors";
 import { emitter } from "./chat/event/index.js";
-import { mapState, sendSocketMessage } from "./chat/store/index.js";
+import store, { mapState, sendSocketMessage } from "./chat/store/index.js";
 import * as emoji from "node-emoji";
 
 function getMediaMessage(author, id, file) {
@@ -107,6 +107,7 @@ export default {
       alwaysScrollToBottom: true,
       messageStyling: true,
       userIsTyping: false,
+      showFile: true,
       types: {
         user: "me",
         bot: "bot",
@@ -144,7 +145,11 @@ export default {
             : this.handleItemSocketAnswer(item);
         });
 
-        if (event.length == 1 && event[0].msg_type == "bot" && !this.isChatOpen) {
+        if (
+          event.length == 1 &&
+          event[0].msg_type == "bot" &&
+          !this.isChatOpen
+        ) {
           this.newMessagesCount = this.newMessagesCount + 1;
         }
       } else {
@@ -162,6 +167,7 @@ export default {
             type: "system",
             data: {
               text: event.response,
+              attachments: event?.attachments,
             },
             author: `bot`,
           },
@@ -176,6 +182,7 @@ export default {
             type: "text",
             data: {
               text: event.response,
+              attachments: event?.attachments,
             },
             author: this.types[event.msg_type] || `bot`,
           },
@@ -201,18 +208,93 @@ export default {
         this.showTypingIndicator = false;
       }
     },
-    onMessageWasSent(message) {
-      if (message.type === "emoji") {
-        const obj = emoji.which(message.data.emoji);
-        sendSocketMessage(obj);
-      } else {
-        sendSocketMessage(message.data.text);
+
+    async uploadFileByS3PresignedURL(file, presigned_url) {
+      const formData = new FormData();
+
+      // Append fields from the response
+      Object.entries(presigned_url.fields).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      // Append the file to the form data
+      formData.append("file", file, file.name);
+
+      try {
+        const httpResponse = await fetch(presigned_url.url, {
+          method: "POST",
+          body: formData,
+        });
+        return httpResponse.status === 204;
+      } catch (error) {
+        return false;
       }
+    },
+
+    async onMessageWasSent(message) {
+      const messageText =
+        message.type === "emoji" ? message.data.emoji : message.data.text;
+
+      const { chatData } = mapState(["chatData"]);
+
+      const attachments = [];
+
+      if (message.files?.length) {
+        const presignedFilesData = await fetch(
+          `${window.apiBaseUrl}/api/attachments/create/post-presigned-url/${
+            chatData.value.org_token
+          }?token=${localStorage.getItem("access_token")}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json", // Indicate JSON payload
+            },
+            body: JSON.stringify({
+              attachments: message.files.map(({ name, type }) => {
+                return {
+                  content_type: type,
+                  name: name,
+                };
+              }),
+            }),
+          }
+        ).then((i) => i.json());
+
+        if (presignedFilesData?.attachments?.length) {
+          presignedFilesData.attachments.forEach((attachment, index) => {
+            const uploaded = this.uploadFileByS3PresignedURL(
+              message.files[index],
+              attachment.presigned_url
+            );
+
+            if (uploaded) {
+              attachments.push({
+                file_name: attachment.file_name,
+                s3_key: attachment.s3_key,
+                bucket: attachment.bucket,
+              });
+            }
+          });
+        }
+      }
+
+      console.log(attachments);
+
+      message.data.attachments = attachments.map(({ file_name }) => {
+        return {
+          filename: file_name,
+          url: "",
+        };
+      });
+
+      sendSocketMessage(messageText, attachments);
       this.showTypingIndicator = true;
       this.messageList = [
         ...this.messageList,
         Object.assign({}, message, { id: Math.random() }),
       ];
+
+      store.setState("isMessageSending", false);
     },
     openChat() {
       this.isChatOpen = true;
