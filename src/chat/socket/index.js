@@ -1,21 +1,23 @@
 import { ref } from "vue";
-import { closeSocketConnection } from "../store/index.js";
+import store from "../store/index.js";
 import { emitter } from "../event/index.js";
 import { ErrorTypes } from "../../error.js";
 let socket;
 export const createSocketConnection = (params) => {
-  const { access_token, refresh_token, userEmail, org_token } = params;
 
   const tokens = ref({
     access_token:
       import.meta.env.MODE === "development"
-        ? localStorage.getItem("access_token") || access_token
-        : access_token,
+        ? localStorage.getItem("access_token") || params.access_token
+        : params.access_token,
     refresh_token:
       import.meta.env.MODE === "development"
-        ? localStorage.getItem("refresh_token") || refresh_token
-        : refresh_token,
+        ? localStorage.getItem("refresh_token") || params.refresh_token
+        : params.refresh_token,
   });
+
+  store.tokens.access_token = tokens.value.access_token;
+  store.tokens.refresh_token = tokens.value.refresh_token;
 
   const refresh = async () => {
     if (!tokens.value.refresh_token) {
@@ -43,6 +45,8 @@ export const createSocketConnection = (params) => {
       }
 
       tokens.value = result;
+      store.tokens.access_token = tokens.value.access_token;
+      store.tokens.refresh_token = tokens.value.refresh_token;
     } catch (e) {
       if (e === ErrorTypes["1002"]) return;
       store.setState("error", 1003);
@@ -82,7 +86,7 @@ export const createSocketConnection = (params) => {
         : window.apiBaseUrl;
 
     socket = new WebSocket(
-      `${socketUrlBaseUrl}/api/livechat/in/${org_token}?token=${tokens.value.access_token}`
+      `${socketUrlBaseUrl}/api/livechat/in/${params.org_token}?token=${tokens.value.access_token}`
     );
 
     socket.onopen = function (e) {
@@ -90,7 +94,7 @@ export const createSocketConnection = (params) => {
         store.setState("loadedConnection", true);
       }, 1000);
       console.log("[socket] connected");
-      store.setSocket(socket, userEmail);
+      store.setSocket(socket, params.userEmail);
     };
 
     socket.onmessage = function (event) {

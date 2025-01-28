@@ -1,5 +1,4 @@
 # Wordpress plugin
-made with Vue 3 + TypeScript + Vite
 
 ## Install
 
@@ -9,6 +8,17 @@ made with Vue 3 + TypeScript + Vite
 
 ## Dev
 - `npm run dev`
+- start the local access channel server
+- generate the access / refresh token, for example using the /docs endpoint of the AC server
+- open the console in the browser and run:
+```javascript
+window.setupChatData({
+  access_token: "<AC access token>",
+  refresh_token: "<AC refresh token>",
+  org_token: "<org token used to generate the tokens>",
+  userEmail: "<email used to generate the tokens>",
+});
+```
 
 ## Add build to plugin
 - in `main.ts` AND `application-exec.js`, make sure the bot title is correct 

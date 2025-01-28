@@ -61,7 +61,6 @@
 import availableColors from "./colors";
 import { emitter } from "./chat/event/index.js";
 import store, { mapState, sendSocketMessage } from "./chat/store/index.js";
-import * as emoji from "node-emoji";
 
 function getMediaMessage(author, id, file) {
   return {
@@ -238,28 +237,30 @@ export default {
       const { chatData } = mapState(["chatData"]);
 
       const attachments = [];
-
+      
       if (message.files?.length) {
-        const presignedFilesData = await fetch(
-          `${window.apiBaseUrl}/api/attachments/create/post-presigned-url/${
-            chatData.value.org_token
-          }?token=${localStorage.getItem("access_token")}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json", // Indicate JSON payload
-            },
-            body: JSON.stringify({
-              attachments: message.files.map(({ name, type }) => {
+        const access_token = store.tokens.access_token;
+        const presignedUrl = `${window.apiBaseUrl}/api/attachments/create/post-presigned-url/${chatData.value.org_token}?token=${access_token}`;
+        const presignedAttachments = message.files.map(({ name, type }) => {
                 return {
                   content_type: type,
                   name: name,
                 };
-              }),
+              });
+        const presignedFilesDataRes = await fetch(
+          presignedUrl,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              attachments: presignedAttachments
             }),
           }
-        ).then((i) => i.json());
-
+        );
+        
+        const presignedFilesData = await presignedFilesDataRes.json();
         if (presignedFilesData?.attachments?.length) {
           presignedFilesData.attachments.forEach((attachment, index) => {
             const uploaded = this.uploadFileByS3PresignedURL(
@@ -277,8 +278,6 @@ export default {
           });
         }
       }
-
-      console.log(attachments);
 
       message.data.attachments = attachments.map(({ file_name }) => {
         return {

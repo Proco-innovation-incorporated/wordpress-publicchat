@@ -188,14 +188,17 @@ button:focus-visible {
   position: relative;
   -webkit-font-smoothing: subpixel-antialiased;
 }
+
 .sc-message--text ::v-deep .sc-message--text-content {
   margin: 0;
   white-space: pre-wrap;
 }
+
 .sc-message--text:hover .sc-message--toolbox {
   left: -20px;
   opacity: 1;
 }
+
 .sc-message--text .sc-message--toolbox {
   transition: left 0.2s ease-out 0s;
   white-space: normal;
@@ -205,6 +208,7 @@ button:focus-visible {
   width: 25px;
   top: 0;
 }
+
 .sc-message--text .sc-message--toolbox button {
   background: none;
   border: none;
@@ -215,12 +219,15 @@ button:focus-visible {
   text-align: center;
   cursor: pointer;
 }
+
 .sc-message--text .sc-message--toolbox button:focus {
   outline: none;
 }
+
 .sc-message--text .sc-message--toolbox ::v-deep svg {
   margin-left: 5px;
 }
+
 .sc-message--text code {
   font-family: "Courier New", Courier, monospace !important;
 }
@@ -276,11 +283,13 @@ a.chatLink {
     transform: translateY(-10px);
     background-color: #9e9da2;
   }
+
   50% {
     transform: translateY(0);
     background-color: #b6b5ba;
   }
 }
+
 .sc-chat-window {
   width: 370px;
   height: calc(100% - 120px);
@@ -312,11 +321,13 @@ a.chatLink {
     display: none;
     opacity: 0;
   }
+
   100% {
     display: flex;
     opacity: 1;
   }
 }
+
 .sc-message--me {
   text-align: right;
 }
@@ -334,13 +345,16 @@ a.chatLink {
     bottom: 0px;
     border-radius: 0px;
   }
+
   .sc-chat-window {
     transition: 0.1s ease-in-out;
   }
+
   .sc-chat-window.closed {
     bottom: 0px;
   }
 }
+
 .sc-header {
   min-height: 75px;
   border-top-left-radius: 9px;
@@ -395,6 +409,7 @@ a.chatLink {
     border-radius: 0px;
   }
 }
+
 .sc-launcher {
   width: 60px;
   height: 60px;
@@ -500,6 +515,7 @@ a.chatLink {
   margin-bottom: 10px;
   display: flex;
 }
+
 .sc-message .sc-message--edited {
   opacity: 0.7;
   word-wrap: normal;
@@ -546,12 +562,14 @@ a.chatLink {
   display: block !important;
   z-index: 10000;
 }
+
 .tooltip .tooltip-inner {
   background: black;
   color: white;
   border-radius: 16px;
   padding: 5px 10px 4px;
 }
+
 .tooltip .tooltip-arrow {
   width: 0;
   height: 0;
@@ -561,9 +579,11 @@ a.chatLink {
   border-color: black;
   z-index: 1;
 }
+
 .tooltip[x-placement^="top"] {
   margin-bottom: 5px;
 }
+
 .tooltip[x-placement^="top"] .tooltip-arrow {
   border-width: 5px 5px 0 5px;
   border-left-color: transparent !important;
@@ -574,9 +594,11 @@ a.chatLink {
   margin-top: 0;
   margin-bottom: 0;
 }
+
 .tooltip[x-placement^="bottom"] {
   margin-top: 5px;
 }
+
 .tooltip[x-placement^="bottom"] .tooltip-arrow {
   border-width: 0 5px 5px 5px;
   border-left-color: transparent !important;
@@ -587,9 +609,11 @@ a.chatLink {
   margin-top: 0;
   margin-bottom: 0;
 }
+
 .tooltip[x-placement^="right"] {
   margin-left: 5px;
 }
+
 .tooltip[x-placement^="right"] .tooltip-arrow {
   border-width: 5px 5px 5px 0;
   border-left-color: transparent !important;
@@ -600,9 +624,11 @@ a.chatLink {
   margin-left: 0;
   margin-right: 0;
 }
+
 .tooltip[x-placement^="left"] {
   margin-right: 5px;
 }
+
 .tooltip[x-placement^="left"] .tooltip-arrow {
   border-width: 5px 0 5px 5px;
   border-top-color: transparent !important;
@@ -613,16 +639,19 @@ a.chatLink {
   margin-left: 0;
   margin-right: 0;
 }
+
 .tooltip[aria-hidden="true"] {
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.15s, visibility 0.15s;
 }
+
 .tooltip[aria-hidden="false"] {
   visibility: visible;
   opacity: 1;
   transition: opacity 0.15s;
 }
+
 .tooltip.info .tooltip-inner {
   background: rgba(0, 68, 153, 0.9);
   color: white;
@@ -630,9 +659,11 @@ a.chatLink {
   border-radius: 5px;
   box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
 }
+
 .tooltip.info .tooltip-arrow {
   border-color: rgba(0, 68, 153, 0.9);
 }
+
 .tooltip.popover .popover-inner {
   background: #f9f9f9;
   color: black;
@@ -640,6 +671,7 @@ a.chatLink {
   border-radius: 5px;
   box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
 }
+
 .tooltip.popover .popover-arrow {
   border-color: #f9f9f9;
 }
@@ -698,7 +730,8 @@ a.chatLink {
 
 .sc-user-input--text:empty:before {
   content: attr(placeholder);
-  display: block; /* For Firefox */
+  display: block;
+    /* For Firefox */
   filter: contrast(15%);
   outline: none;
   cursor: text;
@@ -841,7 +874,8 @@ a.chatLink {
 
 .sc-user-input--text:empty:before {
   content: attr(placeholder);
-  display: block; /* For Firefox */
+  display: block;
+    /* For Firefox */
   filter: contrast(15%);
   outline: none;
   cursor: text;
@@ -1010,16 +1044,20 @@ input[type="file"] {
   justify-content: center;
   align-items: center;
 }
+
 .spiner-wrapper img {
   width: 220px;
   height: 248px;
 }
+
 .spiner-wrapper.spiner-wrapper__page {
   position: fixed;
 }
+
 .spiner-wrapper.spiner-wrapper__local {
   position: absolute;
 }
+
 .spiner-wrapper.spiner-wrapper__local img {
   width: 80px;
   height: 100px;

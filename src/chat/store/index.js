@@ -12,6 +12,10 @@ const store = {
     error: null,
     isMessageSending: true,
   }),
+  tokens: {
+    access_token: null,
+    refresh_token: null,
+  },
   socket: null,
   setSocket(socket, userId) {
     this.socket = socket;
