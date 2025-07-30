@@ -1,5 +1,9 @@
 #!/bin/bash
 
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+SCRIPTDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
 # Default mode
 MODE="dev"
 
@@ -56,3 +60,9 @@ mkdir -p "$RELEASE_DIR"
 cp -r ./chat-plugin/* "$RELEASE_DIR"
 
 echo "Release directory created at $RELEASE_DIR"
+
+(
+	cd "$RELEASE_DIR" && \
+	zip -r "$SCRIPTDIR/chat-plugin.zip" . && 
+	echo "Release zip: $SCRIPTDIR/chat-plugin.zip"
+)

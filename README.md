@@ -23,7 +23,9 @@ window.setupChatData({
 ## Add build to plugin
 - in `main.ts` AND `application-exec.js`, make sure the bot title is correct 
 - run `npm run build:prod` - to build the project for `production` mode
+  - this will result in the `chat-plugin.zip` zip archive being created
 - run `pm run build:dev` - to build the project for `develop` mode
+  - this will result in the `chat-plugin.zip` zip archive being created
 - then you can run `npm run preview` to preview the result of created build
 
  - `npm run build:MODE` will change the Version of the project in `chat-plugin/chat-plugin.php` to patched one
