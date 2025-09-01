@@ -263,21 +263,18 @@ export default {
       error
     } = mapState(["chatConfig", "loadedConnection", "error"]);
 
-    watch(chatConfig, (value) => {
-      if (value) {
-        setTimeout(() => {
-          startSpinnerByName("showLauncher");
-          createSocketConnection(value);
-        }, 0) 
-      }
-    })
+    setTimeout(() => {
+      startSpinnerByName("showLauncher");
+      createSocketConnection();
+    }, 0);
     watch(loadedConnection, (value) => {
       if (value) {
         finishSpinnerByName("showLauncher");
       } else {
         startSpinnerByName("showLauncher");
       }
-    })
+    });
+
     return {
       chatConfig,
       loadedConnection,

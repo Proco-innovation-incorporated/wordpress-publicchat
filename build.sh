@@ -5,7 +5,7 @@ while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
 SCRIPTDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 # Default mode
-MODE="dev"
+MODE="development"
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
@@ -19,7 +19,7 @@ done
 echo "Building in $MODE mode..."
 
 # Determine the correct API base URL
-if [ "$MODE" == "prod" ]; then
+if [ "$MODE" == "production" ]; then
   API_URL="https://channel.prod.ezeeassist.io"
 else
   API_URL="https://channel.dev.ezeeassist.io"

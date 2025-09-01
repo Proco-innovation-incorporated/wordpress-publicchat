@@ -5,7 +5,7 @@
 
 import { computed, ref } from "vue";
 
-const EZEE_PUBLIC_CHAT_SESSION_ID = "ezeePublicChatSessionId";
+const EZEE_PUBLIC_CHAT_SESSION_ID = "ezee.publicChat.sessionId";
 
 const store = {
   state: ref({
@@ -24,13 +24,13 @@ const store = {
     this.socket = socket;
   },
   setupFirst: () => {
-
     store.state = ref({
       editMessage: null,
-      sessionId: this.getSessionId(),
+      sessionId: store.getSessionId(),
     });
   },
   setState(key, val) {
+    console.log('Setting state', key, val);
     this.state.value = {
       ...this.state.value,
       [key]: val,
@@ -38,9 +38,11 @@ const store = {
   },
   getSessionId() {
     let sessionId = window.sessionStorage.getItem(EZEE_PUBLIC_CHAT_SESSION_ID);
+    console.log(`Session ID from Session Storage: ${sessionId}`);
     if (sessionId === null) {
       sessionId = window.crypto.randomUUID();
       window.sessionStorage.setItem(EZEE_PUBLIC_CHAT_SESSION_ID, sessionId);
+      console.log(`Generated Session ID: ${sessionId}`);
     }
     return sessionId;
   },

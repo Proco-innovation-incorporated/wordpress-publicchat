@@ -95,8 +95,8 @@ export default {
   data() {
     const { chatConfig } = mapState(["chatConfig"]);
     return {
-      botTitle: chatConfig.botTitle || "EzeeAssist Helper",
-      titleImageUrl: chatConfig.wordpressPluginPath + "/bot-logo.png",
+      botTitle: chatConfig.value.botTitle || "EzeeAssist Helper",
+      titleImageUrl: chatConfig.value.wordpressPluginPath + "/bot-logo.png",
       messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,
@@ -242,7 +242,7 @@ export default {
       // TODO review and disable
       if (message.files?.length) {
         const access_token = store.tokens.access_token;
-        const presignedUrl = `${chatConfig.apiBaseUrl}/api/attachments/create/post-presigned-url/${chatConfig.value.org_token}?token=${access_token}`;
+        const presignedUrl = `${chatConfig.value.apiBaseUrl}/api/attachments/create/post-presigned-url/${chatConfig.value.org_token}?token=${access_token}`;
         const presignedAttachments = message.files.map(({ name, type }) => {
                 return {
                   content_type: type,

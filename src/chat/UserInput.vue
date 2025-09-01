@@ -181,12 +181,10 @@ export default {
     Loader,
   },
   setup() {
-    const { chatConfig } = mapState(["chatConfig"]);
-
     function reconnect() {
       store.setState("loadedConnection", false);
       store.setState("error", null);
-      createSocketConnection(chatConfig.value);
+      createSocketConnection();
     }
 
     return {

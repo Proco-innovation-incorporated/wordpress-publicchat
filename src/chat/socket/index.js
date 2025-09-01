@@ -12,7 +12,7 @@ export const createSocketConnection = () => {
 
     const { chatConfig } = mapState(["chatConfig"]);
     socket = new WebSocket(
-      `${chatConfig.wsBaseUrl}/api/publicchat/in?token=${chatConfig.publicToken}&session_id=${store.state.sessionId}`
+      `${chatConfig.value.wsBaseUrl}/api/publicchat/in?token=${chatConfig.value.publicToken}&session_id=${store.state.value.sessionId}`
     );
 
     socket.onopen = function (e) {

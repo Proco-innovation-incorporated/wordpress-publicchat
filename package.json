@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build:dev": "./build.sh --mode dev",
-    "build:prod": "./build.sh --mode prod",
+    "dev": "vite --host 0.0.0.0",
+    "build:dev": "./build.sh --mode development",
+    "build:prod": "./build.sh --mode production",
     "preview": "vite preview",
     "vue-tsc": "vue-tsc"
   },
