@@ -68,12 +68,12 @@
 </template>
 
 <script>
-import store, {mapState} from './store/'
-import {watch} from 'vue'
-import ChatWindow from './ChatWindow.vue'
+import store, {mapState} from "./store/"
+import {watch} from "vue"
+import ChatWindow from "./ChatWindow.vue"
 
-import CloseIcon from './assets/close-icon.png'
-import OpenIcon from './assets/logo-no-bg.svg'
+import CloseIcon from "./assets/close-icon.png"
+import OpenIcon from "./assets/logo-no-bg.svg"
 import { emitter } from "./event/index.js";
 import { createSocketConnection } from "./socket/index.js";
 import Loader from "./loading-worker/Loader.vue";
@@ -94,11 +94,11 @@ export default {
         return {
           open: {
             img: OpenIcon,
-            name: 'default'
+            name: "default"
           },
           close: {
             img: CloseIcon,
-            name: 'default'
+            name: "default"
           }
         }
       }
@@ -149,11 +149,11 @@ export default {
     },
     title: {
       type: String,
-      default: () => ''
+      default: () => ""
     },
     titleImageUrl: {
       type: String,
-      default: () => ''
+      default: () => ""
     },
     onMessageWasSent: {
       type: Function,
@@ -169,54 +169,54 @@ export default {
     },
     placeholder: {
       type: String,
-      default: 'Write a message...'
+      default: "Write a message..."
     },
     showTypingIndicator: {
       type: String,
-      default: () => ''
+      default: () => ""
     },
     colors: {
       type: Object,
       validator: (c) =>
-        'header' in c &&
-        'bg' in c.header &&
-        'text' in c.header &&
-        'launcher' in c &&
-        'bg' in c.launcher &&
-        'messageList' in c &&
-        'bg' in c.messageList &&
-        'sentMessage' in c &&
-        'bg' in c.sentMessage &&
-        'text' in c.sentMessage &&
-        'receivedMessage' in c &&
-        'bg' in c.receivedMessage &&
-        'text' in c.receivedMessage &&
-        'userInput' in c &&
-        'bg' in c.userInput &&
-        'text' in c.userInput,
+        "header" in c &&
+        "bg" in c.header &&
+        "text" in c.header &&
+        "launcher" in c &&
+        "bg" in c.launcher &&
+        "messageList" in c &&
+        "bg" in c.messageList &&
+        "sentMessage" in c &&
+        "bg" in c.sentMessage &&
+        "text" in c.sentMessage &&
+        "receivedMessage" in c &&
+        "bg" in c.receivedMessage &&
+        "text" in c.receivedMessage &&
+        "userInput" in c &&
+        "bg" in c.userInput &&
+        "text" in c.userInput,
       default: function () {
         return {
           header: {
-            bg: '#4e8cff',
-            text: '#ffffff'
+            bg: "#4e8cff",
+            text: "#ffffff"
           },
           launcher: {
-            bg: '#4e8cff'
+            bg: "#4e8cff"
           },
           messageList: {
-            bg: '#ffffff'
+            bg: "#ffffff"
           },
           sentMessage: {
-            bg: '#4e8cff',
-            text: '#ffffff'
+            bg: "#4e8cff",
+            text: "#ffffff"
           },
           receivedMessage: {
-            bg: '#f4f7f9',
-            text: '#ffffff'
+            bg: "#f4f7f9",
+            text: "#ffffff"
           },
           userInput: {
-            bg: '#f4f7f9',
-            text: '#565867'
+            bg: "#f4f7f9",
+            text: "#565867"
           }
         }
       }
@@ -236,13 +236,13 @@ export default {
   },
   computed: {
     chatWindowTitle() {
-      if (this.title !== '') return this.title
+      if (this.title !== "") return this.title
 
-      // if (this.participants.length === 0) return 'You'
-      // if (this.participants.length > 1) return 'You, ' + this.participants[0].name + ' & others'
+      // if (this.participants.length === 0) return "You"
+      // if (this.participants.length > 1) return "You, " + this.participants[0].name + " & others"
 
-      return '';
-      // return 'You & ' + this.participants[0].name
+      return "";
+      // return "You & " + this.participants[0].name
     }
   },
   watch: {
@@ -261,21 +261,21 @@ export default {
       chatConfig,
       loadedConnection,
       error
-    } = mapState(['chatConfig', 'loadedConnection', 'error']);
+    } = mapState(["chatConfig", "loadedConnection", "error"]);
 
     watch(chatConfig, (value) => {
       if (value) {
         setTimeout(() => {
-          startSpinnerByName('showLauncher');
+          startSpinnerByName("showLauncher");
           createSocketConnection(value);
         }, 0) 
       }
     })
     watch(loadedConnection, (value) => {
       if (value) {
-        finishSpinnerByName('showLauncher');
+        finishSpinnerByName("showLauncher");
       } else {
-        startSpinnerByName('showLauncher');
+        startSpinnerByName("showLauncher");
       }
     })
     return {
@@ -287,7 +287,7 @@ export default {
   methods: {
     openAndFocus() {
       this.open();
-      emitter.$emit('focusUserInput');
+      emitter.$emit("focusUserInput");
     }
   }
 }
