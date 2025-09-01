@@ -72,6 +72,6 @@ function sendSocketMessage(message, attachments = []) {
 function closeSocketConnection() {
   store.socket = null;
 }
-window.ezee.store = store;
+
 export default store;
 export { mapState, sendSocketMessage, closeSocketConnection };

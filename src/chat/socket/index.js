@@ -1,4 +1,4 @@
-import store from "../store/index.js";
+import store, { mapState }  from "../store/index.js";
 import { emitter } from "../event/index.js";
 import { ErrorTypes } from "../../error.js";
 let socket;
@@ -10,8 +10,9 @@ export const createSocketConnection = () => {
       socket = null;
     }
 
+    const { chatConfig } = mapState(["chatConfig"]);
     socket = new WebSocket(
-      `${window.ezee.wsBaseUrl}/api/publicchat/in?token=${store.state.public_token}&session_id=${store.state.sessionId}`
+      `${chatConfig.wsBaseUrl}/api/publicchat/in?token=${chatConfig.publicToken}&session_id=${store.state.sessionId}`
     );
 
     socket.onopen = function (e) {

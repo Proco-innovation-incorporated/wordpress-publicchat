@@ -11,36 +11,32 @@ declare const window: any;
 (function (){
   const isDevMode: boolean = import.meta.env.MODE === 'development';
 
-  window.ezee = {};
-  // before new build, make sure the title is correct
-  window.ezee.botTitle = 'WSI AI Assistant';
+  window.ezee = window.ezee || {};
 
-  window.ezee.apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  window.ezee.wsBaseUrl = import.meta.env.VITE_WS_BASE_URL;
-
-  // TODO wordpress specific
-  window.ezee.pluginPath = '/wp-content/plugins/chat-plugin/assets';
-  if (isDevMode) {
-    // TODO wordpress specific
-    window.ezee.pluginPath = '';
-  }
-  
-  store.setupFirst()
+  store.setupFirst();
   window.ezee.setupChatConfig = ({
-    public_token,
+    publicToken,
+    botTitle = "Ezee Assist Public Agent",
+    apiBaseUrl = import.meta.env.VITE_API_BASE_URL,
+    wsBaseUrl = import.meta.env.VITE_WS_BASE_URL,
+    wordpressPluginPath = '',
   }: any = {}) => {
-    if (!public_token) {
+    if (!publicToken) {
       throw new Error('Ezee Assist Public Chat requires a Public Token');
     }
   
     store.setState('chatConfig', {
-      public_token,
+      publicToken,
+      botTitle,
+      apiBaseUrl,
+      wsBaseUrl,
+      wordpressPluginPath,
     });
   };
 
   if (isDevMode && import.meta.env.VITE_PUBLIC_TOKEN) {
     window.ezee.setupChatConfig({
-      public_token: import.meta.env.VITE_PUBLIC_TOKEN,
+      publicToken: import.meta.env.VITE_PUBLIC_TOKEN,
     });
   }
 
