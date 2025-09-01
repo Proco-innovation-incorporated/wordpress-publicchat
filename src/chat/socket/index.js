@@ -1,92 +1,17 @@
-import { ref } from "vue";
 import store from "../store/index.js";
 import { emitter } from "../event/index.js";
 import { ErrorTypes } from "../../error.js";
 let socket;
-export const createSocketConnection = (params) => {
 
-  const tokens = ref({
-    access_token:
-      import.meta.env.MODE === "development"
-        ? localStorage.getItem("access_token") || params.access_token
-        : params.access_token,
-    refresh_token:
-      import.meta.env.MODE === "development"
-        ? localStorage.getItem("refresh_token") || params.refresh_token
-        : params.refresh_token,
-  });
-
-  store.tokens.access_token = tokens.value.access_token;
-  store.tokens.refresh_token = tokens.value.refresh_token;
-
-  const refresh = async () => {
-    if (!tokens.value.refresh_token) {
-      store.setState("error", 1000);
-      store.setState("loadedConnection", true);
-      throw new Error(ErrorTypes["1000"]);
-    }
-    try {
-      const result = await fetch(
-        `${window.apiBaseUrl}/api/auth/token/refresh?refresh_token=${tokens.value.refresh_token}`
-      ).then((i) => i.json());
-      if (
-        import.meta.env.MODE === "development" &&
-        result?.access_token &&
-        result?.refresh_token
-      ) {
-        localStorage.setItem("access_token", result.access_token);
-        localStorage.setItem("refresh_token", result.refresh_token);
-      }
-
-      if (!result?.access_token && !result?.refresh_token) {
-        store.setState("error", 1002);
-        store.setState("loadedConnection", true);
-        throw new Error(ErrorTypes["1002"]);
-      }
-
-      tokens.value = result;
-      store.tokens.access_token = tokens.value.access_token;
-      store.tokens.refresh_token = tokens.value.refresh_token;
-    } catch (e) {
-      if (e === ErrorTypes["1002"]) return;
-      store.setState("error", 1003);
-      if (import.meta.env.MODE === "development") {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-      }
-      store.setState("loadedConnection", true);
-      throw new Error(ErrorTypes["1003"]);
-    }
-  };
-  const auth = async () => {
-    await refresh();
-
-    return createConnection();
-  };
-
-  // const createIntervalBeforeRefresh = (socket) => { will detele after test
-  //   const interval = setInterval(async () => {
-  //     socket.close();
-  //     closeSocketConnection();
-  //     await refresh();
-  //     clearInterval(interval);
-  //     createConnection();
-  //   }, 1000 * 60 * 8)
-  // }
-
+export const createSocketConnection = () => {
   const createConnection = () => {
     if (socket) {
       socket.close();
       socket = null;
     }
 
-    let socketUrlBaseUrl =
-      import.meta.env.MODE === "development"
-        ? window.wsBaseUrl
-        : window.apiBaseUrl;
-
     socket = new WebSocket(
-      `${socketUrlBaseUrl}/api/livechat/in/${params.org_token}?token=${tokens.value.access_token}`
+      `${window.ezee.wsBaseUrl}/api/publicchat/in?token=${store.state.public_token}&session_id=${store.state.sessionId}`
     );
 
     socket.onopen = function (e) {
@@ -94,7 +19,7 @@ export const createSocketConnection = (params) => {
         store.setState("loadedConnection", true);
       }, 1000);
       console.log("[socket] connected");
-      store.setSocket(socket, params.userEmail);
+      store.setSocket(socket);
     };
 
     socket.onmessage = function (event) {
@@ -118,8 +43,8 @@ export const createSocketConnection = (params) => {
           `[close] connection closed clearly, code=${event.code} message=${event.reason}`
         );
       } else {
-        // например, сервер убил процесс или сеть недоступна
-        // обычно в этом случае event.code 1006
+        // for example, the server killed the process or the network is unavailable
+        // usually in this case event.code 1006
         store.setState("error", 1001);
         console.error(
           "[close] connection closed dirty ",
@@ -139,9 +64,8 @@ export const createSocketConnection = (params) => {
       throw new Error(ErrorTypes["1004"]);
     };
 
-    // createIntervalBeforeRefresh(socket) //
     return socket;
   };
 
-  return auth();
+  return createConnection();
 };

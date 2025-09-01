@@ -94,8 +94,8 @@ export default {
   name: "App",
   data() {
     return {
-      botTitle: window.botTitle || "EzeeAssist Helper",
-      titleImageUrl: window.pluginPath + "/bot-logo.png",
+      botTitle: window.ezee.botTitle || "EzeeAssist Helper",
+      titleImageUrl: window.ezee.pluginPath + "/bot-logo.png",
       messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,
@@ -234,13 +234,14 @@ export default {
       const messageText =
         message.type === "emoji" ? message.data.emoji : message.data.text;
 
-      const { chatData } = mapState(["chatData"]);
+      const { chatConfig } = mapState(["chatConfig"]);
 
       const attachments = [];
       
+      // TODO review and disable
       if (message.files?.length) {
         const access_token = store.tokens.access_token;
-        const presignedUrl = `${window.apiBaseUrl}/api/attachments/create/post-presigned-url/${chatData.value.org_token}?token=${access_token}`;
+        const presignedUrl = `${window.ezee.apiBaseUrl}/api/attachments/create/post-presigned-url/${chatConfig.value.org_token}?token=${access_token}`;
         const presignedAttachments = message.files.map(({ name, type }) => {
                 return {
                   content_type: type,

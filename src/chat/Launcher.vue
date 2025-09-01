@@ -1,5 +1,5 @@
 <template>
-  <div v-show="chatData">
+  <div v-show="chatConfig">
     <div
       v-show="showLauncher"
       class="sc-launcher"
@@ -74,10 +74,13 @@ import ChatWindow from './ChatWindow.vue'
 
 import CloseIcon from './assets/close-icon.png'
 import OpenIcon from './assets/logo-no-bg.svg'
-import {emitter} from "./event/index.js";
-import {createSocketConnection} from "./socket/index.js";
+import { emitter } from "./event/index.js";
+import { createSocketConnection } from "./socket/index.js";
 import Loader from "./loading-worker/Loader.vue";
-import {finishSpinnerByName, startSpinnerByName} from "./loading-worker";
+import {
+  finishSpinnerByName,
+  startSpinnerByName
+} from "./loading-worker";
 
 export default {
   components: {
@@ -248,39 +251,43 @@ export default {
       immediate: true,
       handler(props) {
         for (const prop in props) {
-          store.setState(prop, props[prop])
+          store.setState(prop, props[prop]);
         }
-      }
+      },
     }
   },
   setup() {
-    const { chatData, loadedConnection, error } = mapState(['chatData', 'loadedConnection', 'error']);
+    const {
+      chatConfig,
+      loadedConnection,
+      error
+    } = mapState(['chatConfig', 'loadedConnection', 'error']);
 
-    watch(chatData, (value) => {
-      if(value) {
+    watch(chatConfig, (value) => {
+      if (value) {
         setTimeout(() => {
-          startSpinnerByName('showLauncher')
-          createSocketConnection(value)
+          startSpinnerByName('showLauncher');
+          createSocketConnection(value);
         }, 0) 
       }
     })
     watch(loadedConnection, (value) => {
-      if(value) {
-        finishSpinnerByName('showLauncher')
+      if (value) {
+        finishSpinnerByName('showLauncher');
       } else {
-        startSpinnerByName('showLauncher')
+        startSpinnerByName('showLauncher');
       }
     })
     return {
-      chatData,
+      chatConfig,
       loadedConnection,
-      error
-    }
+      error,
+    };
   },
   methods: {
     openAndFocus() {
-      this.open()
-      emitter.$emit('focusUserInput')
+      this.open();
+      emitter.$emit('focusUserInput');
     }
   }
 }

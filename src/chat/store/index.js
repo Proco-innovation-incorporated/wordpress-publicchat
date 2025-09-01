@@ -5,33 +5,44 @@
 
 import { computed, ref } from "vue";
 
+const EZEE_PUBLIC_CHAT_SESSION_ID = "ezeePublicChatSessionId";
+
 const store = {
   state: ref({
     editMessage: null,
     loadedConnection: false,
     error: null,
     isMessageSending: true,
+    sessionId: null,
   }),
   tokens: {
     access_token: null,
     refresh_token: null,
   },
   socket: null,
-  setSocket(socket, userId) {
+  setSocket(socket) {
     this.socket = socket;
-    this.socket.userId = userId;
   },
   setupFirst: () => {
+
     store.state = ref({
       editMessage: null,
+      sessionId: this.getSessionId(),
     });
   },
-
   setState(key, val) {
     this.state.value = {
       ...this.state.value,
       [key]: val,
     };
+  },
+  getSessionId() {
+    let sessionId = window.sessionStorage.getItem(EZEE_PUBLIC_CHAT_SESSION_ID);
+    if (sessionId === null) {
+      sessionId = window.crypto.randomUUID();
+      window.sessionStorage.setItem(EZEE_PUBLIC_CHAT_SESSION_ID, sessionId);
+    }
+    return sessionId;
   },
 };
 
@@ -51,7 +62,7 @@ function sendSocketMessage(message, attachments = []) {
       JSON.stringify({
         version: "v1",
         message: message,
-        userid: store.socket.userId,
+        session_id: store.state.sessionId,
         attachments: attachments,
       })
     );
@@ -61,6 +72,6 @@ function sendSocketMessage(message, attachments = []) {
 function closeSocketConnection() {
   store.socket = null;
 }
-window.store = store;
+window.ezee.store = store;
 export default store;
 export { mapState, sendSocketMessage, closeSocketConnection };
