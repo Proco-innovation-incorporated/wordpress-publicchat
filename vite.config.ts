@@ -3,11 +3,13 @@ import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
 import DefineOptions from 'unplugin-vue-define-options/vite'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(), vueJsx(),
-    DefineOptions()
+    vue(),
+    vueJsx(),
+    DefineOptions(),
   ],
   css: {
     modules: {
@@ -15,6 +17,9 @@ export default defineConfig({
     },
   },
   build: {
+    manifest: false,
+    souremap: false,
+    minify: false,
     chunkSizeWarningLimit: 5000,
   },
 });
