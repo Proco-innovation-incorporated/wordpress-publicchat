@@ -9,22 +9,49 @@ import store from './chat/store'
 import './chat/socket'
 declare const window: any;
 (function (){
-  window.pluginPath = import.meta.env.MODE === 'development' ? '' : '/wp-content/plugins/chat-plugin/assets';
-  window.apiBaseUrl = import.meta.env.MODE === 'development' ? import.meta.env.VITE_API_BASE_URL : '';
-  window.wsBaseUrl = import.meta.env.MODE === 'development' ? import.meta.env.VITE_WS_BASE_URL : '';
+  const isDevMode: boolean = import.meta.env.MODE === 'development';
   // before new build, make sure the title is correct
   window.botTitle = 'WSI AI Assistant';
+
+  window.apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  window.wsBaseUrl = import.meta.env.VITE_WS_BASE_URL;
+
+  // TODO wordpress specific
+  window.pluginPath = '/wp-content/plugins/chat-plugin/assets';
+  if (isDevMode) {
+    // TODO wordpress specific
+    window.pluginPath = '';
+  }
   
   store.setupFirst()
-  const shadowRoot = document.createElement('div')
-  shadowRoot.style.position = 'absolute'
-  shadowRoot.style.zIndex = '100000000000000000'
-  document.body.append(shadowRoot)
+  window.setupChatData = ({
+    public_token,
+  }: any = {}) => {
+    if (!public_token) {
+      throw new Error('Ezee Assist Public Chat requires a Public Token');
+    }
+  
+    store.setState('chatData', {
+      public_token,
+    });
+  };
+
+  if (isDevMode && import.meta.env.VITE_PUBLIC_TOKEN) {
+    window.setupChatData({
+      public_token: import.meta.env.VITE_PUBLIC_TOKEN,
+    });
+  }
+
+  // TODO set class and id
+  const shadowRoot = document.createElement('div');
+  shadowRoot.style.position = 'absolute';
+  shadowRoot.style.zIndex = '100000000000000000';
+  document.body.append(shadowRoot);
   if(shadowRoot) {
-    const shadow = shadowRoot.attachShadow({mode: 'open'})
+    const shadow = shadowRoot.attachShadow({mode: 'open'});
     const style = document.createElement('style');
-    const chat = document.createElement('div');
-    chat.id='chat'
+    const chat = document.createElement('div'); // TODO set class
+    chat.id = 'chat';
     style.textContent = styles;
     shadow.appendChild(style);
     shadow.appendChild(chat);
@@ -32,20 +59,5 @@ declare const window: any;
       .component('BubbleChat', Launcher)
       .use(VTooltip)
       .mount(chat);
-  
   }
-  window.setupChatData = ({ access_token, refresh_token, org_token, userEmail, userName, userSurname }: any = {}) => {
-    if(!access_token || !userEmail || !org_token || !refresh_token) {
-      throw new Error('Ezee Assist chat should have client Identificator and email of user.')
-    }
-  
-    store.setState('chatData', {
-      access_token,
-      refresh_token,
-      org_token,
-      userEmail,
-      userName,
-      userSurname
-    })
-  }
-})()
+})();
