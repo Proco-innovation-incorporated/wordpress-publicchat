@@ -30,7 +30,6 @@ const store = {
     });
   },
   setState(key, val) {
-    console.log('Setting state', key, val);
     this.state.value = {
       ...this.state.value,
       [key]: val,
@@ -59,16 +58,15 @@ function mapState(keys) {
 }
 
 function sendSocketMessage(message, attachments = []) {
-  if (store.socket) {
-    store.socket.send(
-      JSON.stringify({
-        version: "v1",
-        message: message,
-        session_id: store.state.sessionId,
-        attachments: attachments,
-      })
-    );
-  }
+  if (!store.socket) return;
+  store.socket.send(
+    JSON.stringify({
+      version: "v1",
+      message: message,
+      session_id: store.state.value.sessionId,
+      attachments: attachments,
+    })
+  );
 }
 
 function closeSocketConnection() {
