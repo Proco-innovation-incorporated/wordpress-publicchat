@@ -95,7 +95,7 @@ export default {
   data() {
     const { chatConfig } = mapState(["chatConfig"]);
     return {
-      botTitle: chatConfig.value.botTitle || "EzeeAssist Helper",
+      botTitle: chatConfig.value.botTitle || "Ezee Assist Agent",
       titleImageUrl: chatConfig.value.wordpressPluginPath + "/bot-logo.png",
       messageList: [],
       newMessagesCount: 0,
