@@ -20,6 +20,7 @@ declare const window: any;
     apiBaseUrl = import.meta.env.VITE_API_BASE_URL,
     wsBaseUrl = import.meta.env.VITE_WS_BASE_URL,
     wordpressPluginPath = "",
+    enableAttachments = false,
   }: any = {}) => {
     if (!publicToken) {
       throw new Error("Ezee Assist Public Chat requires a Public Token");
@@ -31,6 +32,7 @@ declare const window: any;
       apiBaseUrl,
       wsBaseUrl,
       wordpressPluginPath,
+      enableAttachments,
     });
   };
 

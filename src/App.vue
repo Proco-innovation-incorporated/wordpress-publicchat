@@ -107,7 +107,7 @@ export default {
       alwaysScrollToBottom: true,
       messageStyling: true,
       userIsTyping: false,
-      showFile: true,
+      showFile: chatConfig.value.enableAttachments,
       types: {
         user: "me",
         bot: "bot",
