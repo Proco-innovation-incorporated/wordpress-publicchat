@@ -180,19 +180,26 @@ button:focus-visible {
 }
 
 .sc-message--text {
-  padding: 5px !important;
+  padding: 5px 10px !important;
   border-radius: 6px;
   font-weight: 300;
   font-size: 14px;
   line-height: 1.4;
   position: relative;
   -webkit-font-smoothing: subpixel-antialiased;
+
+  .sc-message--text-content {
+    margin: 0;
+    white-space: pre-wrap;
+  }
 }
 
+/*
 .sc-message--text ::v-deep .sc-message--text-content {
   margin: 0;
   white-space: pre-wrap;
 }
+*/
 
 .sc-message--text:hover .sc-message--toolbox {
   left: -20px;

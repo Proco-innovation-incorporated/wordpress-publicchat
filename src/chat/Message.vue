@@ -49,11 +49,13 @@
         v-else-if="isEmoji"
         :data="{ emoji:  message.data.emoji ?? emojiSymbols[message.data.text] }"
       />
+      <!-- disabled for public chat
       <FileMessage
         v-else-if="message.type === 'file'"
         :data="message.data"
         :message-colors="messageColors"
       />
+      -->
       <TypingMessage
         v-else-if="message.type === 'typing'"
         :message-colors="messageColors"

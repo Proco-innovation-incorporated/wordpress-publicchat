@@ -50,7 +50,8 @@
         edited
       </p>
     </slot>
-    <div class="sc-message-atachments">
+    <!-- disabled for public chat
+    <div class="sc-message--atachments">
       <div
         v-for="attachment in message.data.attachments"
         :class="[
@@ -62,6 +63,7 @@
         {{ attachment.filename }}
       </div>
     </div>
+    -->
   </div>
 </template>
 
@@ -176,7 +178,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.sc-message-atachments {
+.sc-message--attachments {
   img {
     cursor: pointer;
   }
