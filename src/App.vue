@@ -100,7 +100,7 @@ export default {
       messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,
-      showTypingIndicator: "",
+      showTypingIndicator: true,
       colors: null,
       availableColors,
       chosenColor: null,
@@ -173,7 +173,7 @@ export default {
           },
           { id: event.id }
         );
-        this.showTypingIndicator = false;
+        this.showTypingIndicator = false; 
       }
       if (!event.msg_type || this.types[event.msg_type]) {
         const message = Object.assign(

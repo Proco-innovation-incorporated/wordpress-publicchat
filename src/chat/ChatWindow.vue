@@ -128,7 +128,7 @@ export default {
       required: true,
     },
     showTypingIndicator: {
-      type: String,
+      type: Boolean,
       required: true,
     },
     colors: {

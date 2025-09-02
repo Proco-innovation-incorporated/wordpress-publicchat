@@ -172,8 +172,8 @@ export default {
       default: "Write a message..."
     },
     showTypingIndicator: {
-      type: String,
-      default: () => ""
+      type: Boolean,
+      required: true,
     },
     colors: {
       type: Object,
