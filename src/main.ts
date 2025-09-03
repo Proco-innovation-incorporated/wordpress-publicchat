@@ -23,7 +23,7 @@ declare const window: any;
     enableAttachments = false,
   }: any = {}) => {
     if (!publicToken) {
-      throw new Error("Ezee Assist Public Chat requires a Public Token");
+      throw new Error("Ezee Assist Public Agent requires a Public Token");
     }
   
     store.setState("chatConfig", {
