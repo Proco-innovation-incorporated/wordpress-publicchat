@@ -191,6 +191,10 @@ button:focus-visible {
   .sc-message--text-content {
     margin: 0;
     white-space: pre-wrap;
+
+    > p {
+      margin: 0 !important;
+    }
   }
 }
 
