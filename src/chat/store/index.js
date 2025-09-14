@@ -59,14 +59,15 @@ function mapState(keys) {
 
 function sendSocketMessage(message, attachments = []) {
   if (!store.socket) return;
-  store.socket.send(
-    JSON.stringify({
-      version: "v1",
-      message: message,
-      session_id: store.state.value.sessionId,
-      attachments: attachments,
-    })
-  );
+  const msg = JSON.stringify({
+    version: "v1",
+    message: message,
+    session_id: store.state.value.sessionId,
+    attachments: attachments,
+  });
+
+  store.socket.send(msg);
+  console.log(`[socket]: Sent Message: ${msg}`);
 }
 
 function closeSocketConnection() {

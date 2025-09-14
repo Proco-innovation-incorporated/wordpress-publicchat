@@ -19,7 +19,7 @@ export const createSocketConnection = () => {
       setTimeout(() => {
         store.setState("loadedConnection", true);
       }, 1000);
-      console.log("[socket] connected");
+      console.log("[socket] Connected");
       store.setSocket(socket);
     };
 
@@ -27,12 +27,12 @@ export const createSocketConnection = () => {
       try {
         const msg = JSON.parse(event.data);
         console.log(
-          `[socket] get message from server: ${JSON.stringify(msg, null, 2)}`
+          `[socket] Received Message: ${JSON.stringify(msg, null, 2)}`
         );
         emitter.$emit("onmessage", msg);
       } catch (error) {
         console.error(
-          `[socket] error on message: ${error.message}\noriginal message: ${event.data}`
+          `[socket] Error receiving Message: ${error.message}\noriginal message: ${event.data}`
         );
       }
     };
@@ -41,14 +41,14 @@ export const createSocketConnection = () => {
       if (event.wasClean) {
         store.setState("error", 1005);
         console.log(
-          `[close] connection closed clearly, code=${event.code} message=${event.reason}`
+          `[close] Connection cleanly closed. code=${event.code} message=${event.reason}`
         );
       } else {
         // for example, the server killed the process or the network is unavailable
         // usually in this case event.code 1006
         store.setState("error", 1001);
         console.error(
-          "[close] connection closed dirty ",
+          "[close] Error cleanly closing Connection",
           event.code,
           event.reason
         );
