@@ -67,7 +67,7 @@ function sendSocketMessage(message, attachments = []) {
   });
 
   store.socket.send(msg);
-  console.log(`[socket]: Sent Message: ${msg}`);
+  console.debug(`[socket]: Sent Message: ${msg}`);
 }
 
 function closeSocketConnection() {

@@ -141,7 +141,9 @@ export default {
       if (Array.isArray(event)) {
         event.forEach((item) => {
           Array.isArray(item)
-            ? item.forEach((nested) => this.handleItemSocketAnswer(nested))
+            ? item.forEach(
+              (nested) => this.handleItemSocketAnswer(nested)
+            )
             : this.handleItemSocketAnswer(item);
         });
 
@@ -176,12 +178,22 @@ export default {
         this.showTypingIndicator = false; 
       }
       if (!event.msg_type || this.types[event.msg_type]) {
+        // merge event.response and event.citations
+        // with HTML given target="_blank"
+
+        let response = event.response;
+        for (const citationObj of event.citations) {
+          const citationNum = citationObj.anchor.split(":")[1].split("]")[0];
+          const link = `<a target="_blank" href="${citationObj.url}">[${citationNum}]</a>`;
+          response = response.replace(citationObj.anchor, link);
+        }
+
         const message = Object.assign(
           {},
           {
             type: "text",
             data: {
-              text: event.response,
+              text: response,
               attachments: event?.attachments,
             },
             author: this.types[event.msg_type] || `bot`,
@@ -192,9 +204,11 @@ export default {
           this.messageList = [
             ...this.messageList,
             message,
-            ...(event.media_urls?.map((i) =>
-              getMediaMessage(`bot`, event.id, i.url)
-            ) || []),
+            ...(
+              event.media_urls?.map(
+                (i) => getMediaMessage(`bot`, event.id, i.url)
+              ) || []
+            ),
           ];
         } else {
           this.messageList = [

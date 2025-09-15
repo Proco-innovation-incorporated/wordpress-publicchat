@@ -19,14 +19,14 @@ export const createSocketConnection = () => {
       setTimeout(() => {
         store.setState("loadedConnection", true);
       }, 1000);
-      console.log("[socket] Connected");
+      console.debug("[socket] Connected");
       store.setSocket(socket);
     };
 
     socket.onmessage = function (event) {
       try {
         const msg = JSON.parse(event.data);
-        console.log(
+        console.debug(
           `[socket] Received Message: ${JSON.stringify(msg, null, 2)}`
         );
         emitter.$emit("onmessage", msg);
@@ -40,7 +40,7 @@ export const createSocketConnection = () => {
     socket.onclose = function (event) {
       if (event.wasClean) {
         store.setState("error", 1005);
-        console.log(
+        console.debug(
           `[close] Connection cleanly closed. code=${event.code} message=${event.reason}`
         );
       } else {
