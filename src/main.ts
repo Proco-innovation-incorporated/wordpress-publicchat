@@ -14,25 +14,26 @@ declare const window: any;
   window.ezee = window.ezee || {};
 
   store.setupFirst();
-  window.ezee.setupChatConfig = ({
-    publicToken,
-    botTitle = "Ezee Assist Public Agent",
-    apiBaseUrl = import.meta.env.VITE_API_BASE_URL,
-    wsBaseUrl = import.meta.env.VITE_WS_BASE_URL,
-    wordpressPluginPath = "",
-    enableAttachments = false,
-  }: any = {}) => {
-    if (!publicToken) {
+  window.ezee.setupChatConfig = (props: any = {}) => {
+    const config = {
+      ...{
+        publicToken: undefined,
+        botTitle: "Ezee Assist Public Agent",
+        apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
+        wsBaseUrl: import.meta.env.VITE_WS_BASE_URL,
+        wordpressPluginPath: "",
+        enableAttachments: false,
+      },
+      ...props,
+    };
+    console.log(config);
+
+    if (!config.publicToken) {
       throw new Error("Ezee Assist Public Agent requires a Public Token");
     }
   
     store.setState("chatConfig", {
-      publicToken,
-      botTitle,
-      apiBaseUrl,
-      wsBaseUrl,
-      wordpressPluginPath,
-      enableAttachments,
+      ...config
     });
   };
 

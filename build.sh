@@ -49,8 +49,8 @@ echo "Version incremented to $NEW_VERSION"
 
 vite build
 
-mv ./dist/assets/index-*.js ./chat-plugin/assets/js/widget-app.js
-mv ./dist/assets/index-*.css ./chat-plugin/assets/css/widget-style.css
+cp ./dist/assets/index-*.js ./chat-plugin/assets/js/widget-app.js
+cp ./dist/assets/index-*.css ./chat-plugin/assets/css/widget-style.css
 
 # Create a release folder based on the version and mode
 RELEASE_DIR="./releases/chat-plugin-$NEW_VERSION-$MODE"
