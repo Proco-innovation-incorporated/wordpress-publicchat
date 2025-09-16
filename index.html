@@ -9,5 +9,15 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        /* use this block to configure the chat component
+        window.ezee.setupChatConfig({
+          publicToken: "",
+        });
+        */
+        window.ezee.initChat();
+      });
+    </script>
   </body>
 </html>

@@ -18,15 +18,17 @@ declare const window: any;
     const config = {
       ...{
         publicToken: undefined,
-        botTitle: "Ezee Assist Public Agent",
+        botTitle: "EZee Assist Public Agent",
         apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
         wsBaseUrl: import.meta.env.VITE_WS_BASE_URL,
-        wordpressPluginPath: "",
+        logoPathPrefix: "",
         enableAttachments: false,
       },
       ...props,
     };
-    console.log(config);
+    if (config.wsBaseUrl === undefined || config.wsBaseUrl === null) {
+      config.wsBaseUrl = "";
+    }
 
     if (!config.publicToken) {
       throw new Error("Ezee Assist Public Agent requires a Public Token");
@@ -43,22 +45,24 @@ declare const window: any;
     });
   }
 
-  // TODO set class and id
-  const shadowRoot = document.createElement("div");
-  shadowRoot.style.position = "absolute";
-  shadowRoot.style.zIndex = "100000000000000000";
-  document.body.append(shadowRoot);
-  if(shadowRoot) {
-    const shadow = shadowRoot.attachShadow({mode: "open"});
-    const style = document.createElement("style");
-    const chat = document.createElement("div"); // TODO set class
-    chat.id = "chat";
-    style.textContent = styles;
-    shadow.appendChild(style);
-    shadow.appendChild(chat);
-    createApp(App)
-      .component("BubbleChat", Launcher)
-      .use(VTooltip)
-      .mount(chat);
-  }
+  window.ezee.initChat = () => {
+    // TODO set class and id
+    const shadowRoot = document.createElement("div");
+    shadowRoot.style.position = "absolute";
+    shadowRoot.style.zIndex = "100000000000000000";
+    document.body.append(shadowRoot);
+    if (shadowRoot) {
+      const shadow = shadowRoot.attachShadow({mode: "open"});
+      const style = document.createElement("style");
+      const chat = document.createElement("div"); // TODO set class
+      chat.id = "chat";
+      style.textContent = styles;
+      shadow.appendChild(style);
+      shadow.appendChild(chat);
+      createApp(App)
+        .component("BubbleChat", Launcher)
+        .use(VTooltip)
+        .mount(chat);
+    }
+  };
 })();

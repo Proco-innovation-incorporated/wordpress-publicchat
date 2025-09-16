@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   window.ezee.setupChatConfig({
     publicToken: '<YOUR_EZEE_ASSIST_PUBLIC_TOKEN>',
-    botTitle: 'WSI AI Assistant',
+    botTitle: 'EZee Assist AI Agent',
     wordpressPluginPath: (
       pluginData.pluginBasePath ?
         `${pluginData.pluginBasePath}assets` :

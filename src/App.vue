@@ -96,9 +96,13 @@ export default {
   name: "App",
   data() {
     const { chatConfig } = mapState(["chatConfig"]);
+    let logoPathPrefix = chatConfig.value?.logoPathPrefix;
+    if (typeof logoPathPrefix !== "string") {
+      logoPathPrefix = ""
+    }
     return {
       botTitle: chatConfig.value?.botTitle || "Ezee Assist Agent",
-      titleImageUrl: chatConfig.value?.wordpressPluginPath + "/bot-logo.png",
+      titleImageUrl: logoPathPrefix + "/bot-logo.png",
       messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,

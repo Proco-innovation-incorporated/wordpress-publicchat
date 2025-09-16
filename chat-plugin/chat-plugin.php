@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Chat Plugin
  * Description: A Vue.js-based chat plugin for WordPress.
- * Version: 0.0.2
+ * Version: 0.0.12
  * Author: Ezee Assist
  */
 
