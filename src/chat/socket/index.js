@@ -1,7 +1,29 @@
 import store, { mapState }  from "../store/index.js";
 import { emitter } from "../event/index.js";
 import { ErrorTypes } from "../../error.js";
+
+const backoffFactor = 0.1;
+const maxBackoffSleep = 30; // seconds
+
 let socket;
+let connectAttempt = 0;
+
+export const reconnect = () => {
+  store.setState("loadedConnection", false);
+  store.setState("error", null);
+
+  const sleepFor = Math.min(
+    backoffFactor * Math.pow(2, connectAttempt),
+    maxBackoffSleep
+  );
+  console.log(connectAttempt, sleepFor);
+  const promise = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("")
+    }, sleepFor);
+  });
+  promise.then(createSocketConnection);
+}
 
 export const createSocketConnection = () => {
   const createConnection = () => {
@@ -14,6 +36,7 @@ export const createSocketConnection = () => {
     socket = new WebSocket(
       `${chatConfig.value.wsBaseUrl}/api/publicchat/in?token=${chatConfig.value.publicToken}&session_id=${store.state.value.sessionId}`
     );
+    connectAttempt++;
 
     socket.onopen = function (e) {
       setTimeout(() => {
@@ -21,6 +44,7 @@ export const createSocketConnection = () => {
       }, 1000);
       console.debug("[socket] Connected");
       store.setSocket(socket);
+      connectAttempt = 0;
     };
 
     socket.onmessage = function (event) {
@@ -56,6 +80,7 @@ export const createSocketConnection = () => {
       }
       // emitting new event so that the interface can update itself
       emitter.$emit("connection-close");
+      reconnect();
     };
 
     socket.onerror = function (error) {
