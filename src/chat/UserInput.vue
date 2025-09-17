@@ -8,7 +8,7 @@
     <form
       class="sc-user-input"
       :class="{ active: inputActive }"
-      v-if="!error"
+      v-if="!error && !connecting"
       :style="{ background: colors.userInput.bg }"
     >
       <div
@@ -98,6 +98,20 @@
         </div>
       </div>
     </form>
+
+    <div
+      v-else-if="!error && connecting"
+      class="sc-user-input sc-user-error"
+      :style="{
+        background: colors.errorInfo.bg,
+        color: colors.errorInfo.text,
+      }"
+    >
+      <div>
+        Connecting to the server
+      </div>
+    </div>
+
     <div
       v-else
       class="sc-user-input sc-user-error"
@@ -113,6 +127,7 @@
         </a>
       </div>
     </div>
+
   </div>
   <div v-if="files.length" class="files-container">
     <!-- <span class="icon-file-message"
@@ -166,7 +181,7 @@ import IconDeleteAttachment from "./components/icons/IconDeleteAttachment.vue";
 import IconSend from "./components/icons/IconSend.vue";
 import { emitter } from "./event/index.js";
 import { ErrorTypes } from "../error.js";
-import { createSocketConnection } from "./socket/index.js";
+import { reconnect as reconnectNow } from "./socket/index.js";
 
 export default {
   components: {
@@ -182,13 +197,11 @@ export default {
   },
   setup() {
     function reconnect() {
-      store.setState("loadedConnection", false);
-      store.setState("error", null);
-      createSocketConnection();
+      reconnectNow(true);
     }
 
     return {
-      ...mapState(["error"]),
+      ...mapState(["error", "connecting"]),
       reconnect,
     };
   },
