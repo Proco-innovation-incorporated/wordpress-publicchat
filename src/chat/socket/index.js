@@ -16,7 +16,7 @@ export const reconnect = () => {
     backoffFactor * Math.pow(2, connectAttempt),
     maxBackoffSleep
   );
-  console.log(connectAttempt, sleepFor);
+  console.log("Websocket reconnect backoff", connectAttempt, sleepFor);
   const promise = new Promise((resolve) => {
     setTimeout(() => {
       resolve("")
