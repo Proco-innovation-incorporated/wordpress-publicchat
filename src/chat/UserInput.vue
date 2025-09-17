@@ -36,7 +36,7 @@
         </div>
         <!--        v-if="showEmoji && !isEditing"-->
         <div
-          v-if="!isMessageSending"
+          v-if="showFeedback && !isMessageSending"
           @click="_handleEmojiPicked('👎')"
           class="sc-user-input--button"
           style="cursor: pointer; margin-right: 10px"
@@ -44,7 +44,7 @@
           👎
         </div>
         <div
-          v-if="!isMessageSending"
+          v-if="showFeedback && !isMessageSending"
           @click="_handleEmojiPicked('👍')"
           class="sc-user-input--button"
           style="cursor: pointer; margin-right: 10px"
@@ -212,6 +212,11 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    showFeedback: {
+      type: Boolean,
+      default: () => false,
+    },
+
     suggestions: {
       type: Array,
       default: () => [],

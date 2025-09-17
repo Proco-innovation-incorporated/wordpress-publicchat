@@ -27,6 +27,7 @@
       :title="chatWindowTitle"
       :is-open="isOpen"
       :show-emoji="showEmoji"
+      :show-feedback="showFeedback"
       :show-file="showFile"
       :show-header="showHeader"
       :placeholder="placeholder"
@@ -104,6 +105,10 @@ export default {
       }
     },
     showEmoji: {
+      type: Boolean,
+      default: false
+    },
+    showFeedback: {
       type: Boolean,
       default: false
     },
