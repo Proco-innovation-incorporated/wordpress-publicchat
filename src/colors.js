@@ -1,4 +1,5 @@
 export default {
+  /*
   red: {
     header: {
       bg: '#D32F2F',
@@ -55,6 +56,35 @@ export default {
       text: '#212121'
     }
   },
+  dark: {
+    header: {
+      bg: '#466281',
+      text: '#ecf0f1'
+    },
+    launcher: {
+      bg: '#466281'
+    },
+    messageList: {
+      bg: '#466281'
+    },
+    sentMessage: {
+      bg: '#7f8c8d',
+      text: '#ecf0f1'
+    },
+    receivedMessage: {
+      bg: '#95a5a6',
+      text: '#ecf0f1'
+    },
+    userInput: {
+      bg: '#34495e',
+      text: '#ecf0f1'
+    },
+    userList: {
+      bg: '#2c3e50',
+      text: '#ecf0f1'
+    }
+  },
+  */
   blue: {
     errorInfo: {
       bg: '#ffffff',
@@ -89,33 +119,41 @@ export default {
       text: '#212121'
     }
   },
-  dark: {
+  /*
+  brand: {
+    errorInfo: {
+      bg: '#ffffff',
+      text: '#D32F2F',
+    },
     header: {
-      bg: '#466281',
-      text: '#ecf0f1'
+      bg: var(--brand-color),
+      text: '#ffffff',
+      bgError: '#D32F2F'
     },
     launcher: {
-      bg: '#466281'
+      bg: var(--brand-color),
+      bgError: '#D32F2F'
     },
     messageList: {
-      bg: '#466281'
+      bg: '#ffffff'
     },
     sentMessage: {
-      bg: '#7f8c8d',
-      text: '#ecf0f1'
+      bg: var(--brand-color),
+      text: '#ffffff'
     },
     receivedMessage: {
-      bg: '#95a5a6',
-      text: '#ecf0f1'
+      bg: '#eaeaea',
+      text: '#222222'
     },
     userInput: {
-      bg: '#34495e',
-      text: '#ecf0f1'
+      bg: '#fff',
+      text: '#212121'
     },
     userList: {
-      bg: '#2c3e50',
-      text: '#ecf0f1'
+      bg: '#fff',
+      text: '#212121'
     }
-  }
+  },
+  */
 }
 

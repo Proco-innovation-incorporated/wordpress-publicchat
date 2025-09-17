@@ -5,7 +5,7 @@ import { createApp } from "vue"
 import styles from "./style.css?inline"
 import App from "./App.vue"
 import Launcher from "./chat/Launcher.vue";
-import store from "./chat/store"
+import store, { loadOrgBranding } from "./chat/store"
 import "./chat/socket"
 declare const window: any;
 (function (){
@@ -45,17 +45,21 @@ declare const window: any;
     });
   }
 
-  window.ezee.initChat = () => {
-    // TODO set class and id
+  window.ezee.initChat = async () => {
+    await loadOrgBranding();
+
     const shadowRoot = document.createElement("div");
+    shadowRoot.id = "shadow-root"
+    shadowRoot.className = "shadow-root"
     shadowRoot.style.position = "absolute";
     shadowRoot.style.zIndex = "100000000000000000";
     document.body.append(shadowRoot);
     if (shadowRoot) {
       const shadow = shadowRoot.attachShadow({mode: "open"});
       const style = document.createElement("style");
-      const chat = document.createElement("div"); // TODO set class
+      const chat = document.createElement("div");
       chat.id = "chat";
+      chat.class = "chat-root";
       style.textContent = styles;
       shadow.appendChild(style);
       shadow.appendChild(chat);

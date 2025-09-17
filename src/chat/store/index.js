@@ -15,10 +15,12 @@ const store = {
     isMessageSending: true,
     sessionId: null,
   }),
+  /*
   tokens: {
     access_token: null,
     refresh_token: null,
   },
+  */
   socket: null,
   setSocket(socket) {
     this.socket = socket;
@@ -74,5 +76,38 @@ function closeSocketConnection() {
   store.socket = null;
 }
 
+async function loadOrgBranding() {
+  const { chatConfig } = mapState(["chatConfig"]);
+  const url = `${chatConfig.value.apiBaseUrl}/api/publicchat/org/branding?token=${chatConfig.value.publicToken}`
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    const result = await response.json()
+    store.setState("orgBranding", {
+      ...result
+    });
+  }
+  catch(error) {
+    console.error("Error loading Org branding", error.message)
+    store.setState("orgBranding", {
+      code: null,
+      name: null,
+      bot_name: null,
+      bot_icon: null,
+      org_logo: null,
+      highlight_color: '#4e8cff',
+    });
+  }
+}
+
 export default store;
-export { mapState, sendSocketMessage, closeSocketConnection };
+export {
+  mapState,
+  sendSocketMessage,
+  closeSocketConnection,
+  loadOrgBranding
+};

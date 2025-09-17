@@ -60,7 +60,7 @@
 <script>
 import { parseBlocks, parseIncompleteMarkdown } from 'streamdown-vue';
 
-import availableColors from "./colors";
+//import availableColors from "./colors";
 import { emitter } from "./chat/event/index.js";
 import store, { mapState, sendSocketMessage } from "./chat/store/index.js";
 
@@ -95,21 +95,66 @@ function tryToGetMediaFromMessage(message) {
 export default {
   name: "App",
   data() {
-    const { chatConfig } = mapState(["chatConfig"]);
+    const { chatConfig, orgBranding } = mapState(["chatConfig", "orgBranding"]);
     let logoPathPrefix = chatConfig.value?.logoPathPrefix;
     if (typeof logoPathPrefix !== "string") {
       logoPathPrefix = ""
     }
+
+    const brandColor = orgBranding.value?.highlight_color || '#4e8cff';
+    document.documentElement.style.setProperty('--brand-color', brandColor);
+
     return {
-      botTitle: chatConfig.value?.botTitle || "Ezee Assist Agent",
-      titleImageUrl: logoPathPrefix + "/bot-logo.png",
+      botTitle: (
+        orgBranding.value?.bot_name ||
+        chatConfig.value?.botTitle ||
+        "Ezee Assist Agent"
+      ),
+      titleImageUrl: (
+        orgBranding.value?.org_logo ||
+        (logoPathPrefix + "/bot-logo.png")
+      ),
       messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,
       showTypingIndicator: true,
-      colors: null,
-      availableColors,
-      chosenColor: null,
+      //colors: null,
+      //availableColors,
+      //chosenColor: null,
+      colors: {
+        errorInfo: {
+          bg: '#ffffff',
+          text: '#D32F2F',
+        },
+        header: {
+          bg: brandColor,
+          text: '#ffffff',
+          bgError: '#D32F2F'
+        },
+        launcher: {
+          bg: brandColor,
+          bgError: '#D32F2F'
+        },
+        messageList: {
+          bg: '#ffffff'
+        },
+        sentMessage: {
+          bg: brandColor,
+          text: '#ffffff'
+        },
+        receivedMessage: {
+          bg: '#eaeaea',
+          text: '#222222'
+        },
+        userInput: {
+          bg: '#fff',
+          text: '#212121'
+        },
+        userList: {
+          bg: '#fff',
+          text: '#212121'
+        }
+      },
       alwaysScrollToBottom: true,
       messageStyling: true,
       userIsTyping: false,
@@ -143,7 +188,7 @@ export default {
     },
   },
   created() {
-    this.setColor("blue");
+    //this.setColor("blue");
   },
   mounted() {
     emitter.$on("onmessage", (event) => {
@@ -298,6 +343,7 @@ export default {
       const attachments = [];
       
       // TODO review and disable
+      /*
       if (message.files?.length) {
         const access_token = store.tokens.access_token;
         const presignedUrl = `${chatConfig.value.apiBaseUrl}/api/attachments/create/post-presigned-url/${chatConfig.value.org_token}?token=${access_token}`;
@@ -338,6 +384,7 @@ export default {
           });
         }
       }
+      */
 
       message.data.attachments = attachments.map(({ file_name }) => {
         return {
@@ -366,10 +413,12 @@ export default {
     closeChat() {
       this.isChatOpen = false;
     },
+    /*
     setColor(color) {
       this.colors = this.availableColors[color];
       this.chosenColor = color;
     },
+    */
     showStylingInfo() {
       this.$modal.show("dialog", {
         title: "Info",
