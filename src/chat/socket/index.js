@@ -20,10 +20,11 @@ export const reconnect = (connectNow=false) => {
       backoffFactor * Math.pow(2, connectAttempt),
       maxBackoffSleep
     );
-    console.log("Websocket reconnect backoff", connectAttempt, sleepFor);
+    console.log("Backing off before retrying Websocket connection", connectAttempt, sleepFor);
     const promise = new Promise((resolve) => {
       setTimeout(() => {
-        resolve("")
+        console.log("Retrying Websocket connection");
+        resolve("");
       }, sleepFor);
     });
     promise.then(createSocketConnection);
@@ -83,7 +84,7 @@ export const createSocketConnection = () => {
           event.code,
           event.reason
         );
-        throw new Error(ErrorTypes["1001"]);
+        //throw new Error(ErrorTypes["1001"]);
       }
       // emitting new event so that the interface can update itself
       emitter.$emit("connection-close");
@@ -94,7 +95,7 @@ export const createSocketConnection = () => {
       store.setState("error", 1004);
       console.error(`[error]`, error);
       store.setState("loadedConnection", true);
-      throw new Error(ErrorTypes["1004"]);
+      //throw new Error(ErrorTypes["1004"]);
     };
 
     return socket;
