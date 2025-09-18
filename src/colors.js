@@ -1,5 +1,4 @@
 export default {
-  /*
   red: {
     header: {
       bg: '#D32F2F',
@@ -84,7 +83,6 @@ export default {
       text: '#ecf0f1'
     }
   },
-  */
   blue: {
     errorInfo: {
       bg: '#ffffff',
@@ -119,7 +117,7 @@ export default {
       text: '#212121'
     }
   },
-  /*
+  /* dumb me... this is javascript so no var()
   brand: {
     errorInfo: {
       bg: '#ffffff',
