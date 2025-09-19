@@ -61,6 +61,7 @@
 import { parseBlocks, parseIncompleteMarkdown } from 'streamdown-vue';
 
 //import availableColors from "./colors";
+import { invertColor }  from "./colors";
 import { emitter } from "./chat/event/index.js";
 import store, { mapState, sendSocketMessage } from "./chat/store/index.js";
 
@@ -102,6 +103,7 @@ export default {
     }
 
     const brandColor = orgBranding.value?.highlight_color || '#4e8cff';
+    const textColor = invertColor(brandColor, true);
     document.documentElement.style.setProperty('--brand-color', brandColor);
 
     return {
@@ -128,7 +130,7 @@ export default {
         },
         header: {
           bg: brandColor,
-          text: '#ffffff',
+          text: textColor,
           bgError: '#D32F2F'
         },
         launcher: {
@@ -140,7 +142,7 @@ export default {
         },
         sentMessage: {
           bg: brandColor,
-          text: '#ffffff'
+          text: textColor,
         },
         receivedMessage: {
           bg: '#eaeaea',

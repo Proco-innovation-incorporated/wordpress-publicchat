@@ -4,7 +4,7 @@
       ? 'spiner-wrapper__page'
       : 'spiner-wrapper__local'
   ]">
-    <img :src="Loader" alt="Loader">
+    <img :src="Loader" alt="">
   </div>
 </template>
 

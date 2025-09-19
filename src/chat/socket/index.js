@@ -3,17 +3,36 @@ import { emitter } from "../event/index.js";
 import { ErrorTypes } from "../../error.js";
 
 const backoffFactor = 0.1;
-const maxBackoffSleep = 10; // seconds
+const maxAttempts = 5000;
+const maxBackoffSleep = 30; // seconds
 
 let socket;
 let connectAttempt = 0;
+let inConnectAttempt = false;
 
 export const reconnect = (connectNow=false) => {
+  if (inConnectAttempt) {
+    console.info("Alreading attempting Websocket connection. Skipping");
+    return;
+  }
+  elif (connectAttempt >= maxAttempts) {
+    console.error("Too many consecutive failed attempts. User intervention required");
+    connectAttempt = 0;
+    store.setState("error", 1013);
+    return;
+  }
+
+  inConnectAttempt = true;
+
   store.setState("loadedConnection", false);
   store.setState("error", null);
 
   if (connectNow) {
-    createSocketConnection();
+    try {
+      createSocketConnection();
+    }
+    catch(e) {}
+    inConnectAttempt = false;
   }
   else {
     const sleepFor = Math.min(
@@ -27,7 +46,13 @@ export const reconnect = (connectNow=false) => {
         resolve("");
       }, sleepFor);
     });
-    promise.then(createSocketConnection);
+    promise.then(() => {
+      try {
+        createSocketConnection();
+      }
+      catch(e) {}
+      inConnectAttempt = false;
+    });
   }
 }
 

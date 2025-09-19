@@ -78,6 +78,9 @@ function closeSocketConnection() {
 
 async function loadOrgBranding() {
   const { chatConfig } = mapState(["chatConfig"]);
+  if (!chatConfig.value?.apiBaseUrl) {
+    throw new Error('Cannot fetch Org Branding. Set up configs before calling');
+  }
   const url = `${chatConfig.value.apiBaseUrl}/api/publicchat/org/branding?token=${chatConfig.value.publicToken}`
 
   try {
