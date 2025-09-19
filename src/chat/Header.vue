@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import {mapState} from './store/'
-import CloseIcon from './assets/close-icon-big.png'
+import { mapState } from './store/';
+import CloseIcon from './assets/close-icon-big.png';
 
 export default {
   props: {

@@ -55,6 +55,7 @@
 </template>
 
 <script>
+import { mapState } from './store/';
 import Message from "./Message.vue";
 import chatIcon from "./assets/chat-icon.svg";
 
@@ -99,6 +100,9 @@ export default {
   updated() {
     if (this.shouldScrollToBottom()) this.$nextTick(this._scrollDown(true));
   },
+  setup() {
+    return mapState(["orgBranding"]);
+  },
   methods: {
     _scrollDown(isSmooth = false) {
       setTimeout(() => {
@@ -119,7 +123,18 @@ export default {
       return this.alwaysScrollToBottom || scrollable;
     },
     profile(author) {
-      return { imageUrl: "", name: "" };
+      switch (author) {
+        case "me":
+          return { imageUrl: "", name: "me" };
+          break;
+        case "bot":
+        default:
+          return {
+            imageUrl: this.orgBranding.bot_icon,
+            name: this.orgBranding.bot_name,
+          };
+          break;
+      }
     },
   },
 };

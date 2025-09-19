@@ -10,10 +10,13 @@
     >
       <slot name="user-avatar" :message="message" :user="user">
         <div
-          v-if="message.type !== 'system' && authorName && authorName !== 'me'"
+          v-if="message.type !== 'system' && authorName"
           v-tooltip="authorName"
           :title="authorName"
           class="sc-message--avatar"
+          :class="{
+            sent: message.author === 'me',
+          }"
           :style="{
             backgroundImage: `url(${chatImageUrl})`,
           }"
@@ -78,6 +81,7 @@ import EmojiMessage from "./messages/EmojiMessage.vue";
 import TypingMessage from "./messages/TypingMessage.vue";
 import SystemMessage from "./messages/SystemMessage.vue";
 import chatIcon from "./assets/chat-icon.svg";
+import userIcon from "./assets/user-icon.svg";
 
 export default {
   components: {
@@ -122,7 +126,7 @@ export default {
       return this.user && this.user.name;
     },
     chatImageUrl() {
-      return (this.user && this.user.imageUrl) || chatIcon;
+      return (this.user && this.user.imageUrl) || userIcon;
     },
     messageColors() {
       return this.message.author === "me"

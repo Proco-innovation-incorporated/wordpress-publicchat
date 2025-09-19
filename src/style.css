@@ -540,26 +540,28 @@ a.chatLink {
 }
 
 .sc-message--content.sent {
-  justify-content: flex-end;
+  flex-direction: row-reverse;
 }
 
 .sc-message--content.system {
   justify-content: center;
 }
 
-.sc-message--content.sent .sc-message--avatar {
-  display: none;
-}
-
 .sc-message--avatar {
   align-self: baseline;
   background-repeat: no-repeat;
   background-size: 100%;
-  background-position: center;
+  background-position: center center;
   min-width: 30px;
   min-height: 30px;
-  border-radius: 50%;
+}
+
+.sc-message--content.received .sc-message--avatar {
   margin-right: 15px;
+}
+
+.sc-message--content.sent .sc-message--avatar {
+  margin-left: 15px;
 }
 
 .sc-message--meta {
