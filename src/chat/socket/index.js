@@ -15,7 +15,7 @@ export const reconnect = (connectNow=false) => {
     console.info("Alreading attempting Websocket connection. Skipping");
     return;
   }
-  elif (connectAttempt >= maxAttempts) {
+  else if (connectAttempt >= maxAttempts) {
     console.error("Too many consecutive failed attempts. User intervention required");
     connectAttempt = 0;
     store.setState("error", 1013);
