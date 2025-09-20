@@ -1,8 +1,8 @@
 <template>
-  <div class="spiner-wrapper" v-if="loading" :class="[
+  <div class="spinner-wrapper" v-if="loading" :class="[
     type === 'global'
-      ? 'spiner-wrapper__page'
-      : 'spiner-wrapper__local'
+      ? 'spinner-wrapper__page'
+      : 'spinner-wrapper__local'
   ]">
     <img :src="Loader" alt="">
   </div>
