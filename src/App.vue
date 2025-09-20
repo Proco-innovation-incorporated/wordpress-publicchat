@@ -220,21 +220,19 @@ export default {
     handleItemSocketAnswer(event) {
       const extras = event.extras || {};
 
-      if (event.msg_type === "system" && !event.success) {
-        Object.assign(
-          {},
-          {
-            type: "system",
-            data: {
-              text: event.response,
-              attachments: event?.attachments,
-            },
-            author: `bot`,
-          },
-          { id: event.id }
-        );
-        this.showTypingIndicator = false; 
+      if (event.msg_type === "system") {
+        switch (event.response) {
+          case "ready-for-messages":
+            this.showTypingIndicator = false;
+            break;
+          case "message-received":
+          default:
+            this.showTypingIndicator = true;
+            break;
+        }
+        return;
       }
+
       if (!event.msg_type || this.types[event.msg_type]) {
         // merge event.response and event.citations
         // with HTML given target="_blank"
