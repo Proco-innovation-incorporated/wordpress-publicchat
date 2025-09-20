@@ -1,5 +1,5 @@
 import Launcher from './Launcher.vue'
-import VTooltip from 'v-tooltip'
+//import VTooltip from 'v-tooltip'
 
 const defaultComponentName = 'BubbleChat'
 
@@ -28,7 +28,7 @@ const Plugin = {
      * Sets custom component name (if provided)
      */
     Vue.component(this.componentName, Launcher)
-    Vue.use(VTooltip)
+    //Vue.use(VTooltip)
   }
 }
 

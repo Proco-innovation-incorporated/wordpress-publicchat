@@ -1,12 +1,15 @@
 /* eslint-disable import/order */
+import 'floating-vue/dist/style.css';
+import FloatingVue from 'floating-vue';
+//import VTooltip from "v-tooltip";
 
-import VTooltip from "v-tooltip";
-import { createApp } from "vue"
-import styles from "./style.css?inline"
-import App from "./App.vue"
+import styles from "./style.css?inline";
+
+import { createApp } from "vue";
+import App from "./App.vue";
 import Launcher from "./chat/Launcher.vue";
-import store, { loadOrgBranding } from "./chat/store"
-import "./chat/socket"
+import store, { loadOrgBranding } from "./chat/store";
+import "./chat/socket";
 declare const window: any;
 (function (){
   const isDevMode: boolean = import.meta.env.MODE === "development";
@@ -52,7 +55,7 @@ declare const window: any;
     shadowRoot.id = "shadow-root"
     shadowRoot.className = "shadow-root"
     shadowRoot.style.position = "absolute";
-    shadowRoot.style.zIndex = "100000000000000000";
+    shadowRoot.style.zIndex = "999999";
     document.body.append(shadowRoot);
     if (shadowRoot) {
       const shadow = shadowRoot.attachShadow({mode: "open"});
@@ -65,7 +68,8 @@ declare const window: any;
       shadow.appendChild(chat);
       createApp(App)
         .component("BubbleChat", Launcher)
-        .use(VTooltip)
+        //.use(VTooltip)
+        .use(FloatingVue)
         .mount(chat);
     }
   };

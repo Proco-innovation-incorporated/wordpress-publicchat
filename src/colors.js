@@ -124,19 +124,19 @@ export default {
       text: '#D32F2F',
     },
     header: {
-      bg: var(--brand-color),
+      bg: var(--ezee-public-chat--brand-color),
       text: '#ffffff',
       bgError: '#D32F2F'
     },
     launcher: {
-      bg: var(--brand-color),
+      bg: var(--ezee-public-chat--brand-color),
       bgError: '#D32F2F'
     },
     messageList: {
       bg: '#ffffff'
     },
     sentMessage: {
-      bg: var(--brand-color),
+      bg: var(--ezee-public-chat--brand-color),
       text: '#ffffff'
     },
     receivedMessage: {

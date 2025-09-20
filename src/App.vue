@@ -104,7 +104,7 @@ export default {
 
     const brandColor = orgBranding.value?.highlight_color || '#4e8cff';
     const textColor = invertColor(brandColor, true);
-    document.documentElement.style.setProperty('--brand-color', brandColor);
+    document.documentElement.style.setProperty('--ezee-public-chat--brand-color', brandColor);
 
     return {
       botTitle: (
@@ -531,5 +531,9 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+:global(.v-popper__popper) {
+  z-index: 1000000;
 }
 </style>
