@@ -1,5 +1,11 @@
 <template>
-  <div class="sc-chat-window" :class="{ opened: isOpen, closed: !isOpen }">
+  <div
+    class="sc-chat-window"
+    :class="{
+      opened: isOpen,
+      closed: !isOpen,
+      full: showFullSizeChat,
+    }">
     <Header
       v-if="showHeader"
       :title="title"
@@ -75,6 +81,8 @@
 </template>
 
 <script>
+import { mapState } from './store/';
+
 import Header from "./Header.vue";
 import MessageList from "./MessageList.vue";
 import UserInput from "./UserInput.vue";
@@ -128,6 +136,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    isOpenFull: {
+      type: Boolean,
+      default: () => false,
+    },
     placeholder: {
       type: String,
       required: true,
@@ -165,6 +177,13 @@ export default {
       let messages = this.messageList;
       return messages;
     },
+  },
+  setup() {
+    return {
+      ...mapState([
+        'showFullSizeChat',
+      ])
+    }
   },
   methods: {
     handleUserListToggle(showUserList) {

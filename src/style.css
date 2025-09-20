@@ -302,7 +302,7 @@ a.chatLink {
 }
 
 .sc-chat-window {
-  width: 370px;
+  width: 400px;
   height: calc(100% - 120px);
   max-height: 590px;
   position: fixed;
@@ -319,6 +319,10 @@ a.chatLink {
   animation: fadeIn;
   animation-duration: 0.3s;
   animation-timing-function: ease-in-out;
+}
+
+.sc-chat-window.full {
+  width: min(800px, 50vw);
 }
 
 .sc-chat-window.closed {
@@ -361,6 +365,10 @@ a.chatLink {
     transition: 0.1s ease-in-out;
   }
 
+  .sc-chat-window.full {
+    width: 100%;
+  }
+
   .sc-chat-window.closed {
     bottom: 0px;
   }
@@ -393,26 +401,35 @@ a.chatLink {
   font-size: 20px;
 }
 
-.sc-header--close-button {
+
+.sc-header--button {
   width: 40px;
   align-self: center;
   height: 40px;
-  margin-right: 10px;
   box-sizing: border-box;
   cursor: pointer;
   border-radius: 5px;
   margin-left: auto;
 }
 
-.sc-header--close-button:hover {
+.sc-header--button:hover {
   box-shadow: 0px 2px 5px rgba(0, 0, 1, 0.1);
 }
 
-.sc-header--close-button img {
+.sc-header--button img {
   width: 100%;
   height: 100%;
   padding: 13px;
   box-sizing: border-box;
+}
+
+.sc-header--button.open-full img,
+.sc-header--button.close-full img {
+  padding: 10px;
+}
+
+.sc-header--button.close {
+  margin-right: 10px;
 }
 
 @media (max-width: 450px) {
