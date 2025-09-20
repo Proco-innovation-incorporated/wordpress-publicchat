@@ -241,7 +241,7 @@ export default {
         let response = event.response;
         for (const citationObj of event.citations) {
           const citationNum = citationObj.anchor.split(":")[1].split("]")[0];
-          const link = `<a target="_blank" href="${citationObj.url}">[${citationNum}]</a>`;
+          const link = `<a target="_blank" class="citation" href="${citationObj.url}">[${citationNum}]</a>`;
           response = response.replace(citationObj.anchor, link);
         }
 
@@ -276,6 +276,7 @@ export default {
           const repaired = parseIncompleteMarkdown(this.stream.rawBuffer);
           const blocks = parseBlocks(repaired);
           m.data.text = blocks.join('');
+          console.debug(m.data.text);
           if (m !== message) {
             m.data.attachments.push(...message.data.attachments);
           }

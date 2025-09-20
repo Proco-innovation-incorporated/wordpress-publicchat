@@ -11,8 +11,8 @@
         {{ newMessagesCount }}
       </div>
       <template v-if="loadedConnection">
-        <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" :alt="icons.close.name" />
-        <img v-else class="sc-open-icon" :src="icons.open.img" :alt="icons.open.name" />
+        <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" alt="" />
+        <img v-else class="sc-open-icon" :src="icons.open.img" alt="" />
       </template>
 
       <div v-show="!loadedConnection" style="position: absolute; top:-100%; left: 0; width: 100%; height: 100%">

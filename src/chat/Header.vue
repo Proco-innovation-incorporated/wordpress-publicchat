@@ -6,7 +6,7 @@
     </div>
     <div v-else class="sc-header--title">{{ title }}</div>
     <div v-if="showCloseButton" class="sc-header--close-button" @click="$emit('close')">
-      <img :src="icons.close.img" :alt="icons.close.name" />
+      <img :src="icons.close.img" alt="" />
     </div>
   </div>
 </template>

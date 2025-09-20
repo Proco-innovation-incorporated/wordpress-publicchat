@@ -8,11 +8,11 @@ const maxBackoffSleep = 30; // seconds
 
 let socket;
 let connectAttempt = 0;
-let inConnectAttempt = false;
+let attemptingConnection = false;
 
 export const reconnect = (connectNow=false) => {
-  if (inConnectAttempt) {
-    console.info("Alreading attempting Websocket connection. Skipping");
+  if (attemptingConnection) {
+    console.info("Already attempting Websocket connection. Skipping");
     return;
   }
   else if (connectAttempt >= maxAttempts) {
@@ -22,7 +22,7 @@ export const reconnect = (connectNow=false) => {
     return;
   }
 
-  inConnectAttempt = true;
+  attemptingConnection = true;
 
   store.setState("loadedConnection", false);
   store.setState("error", null);
@@ -32,7 +32,6 @@ export const reconnect = (connectNow=false) => {
       createSocketConnection();
     }
     catch(e) {}
-    inConnectAttempt = false;
   }
   else {
     const sleepFor = Math.min(
@@ -44,14 +43,13 @@ export const reconnect = (connectNow=false) => {
       setTimeout(() => {
         console.log("Retrying Websocket connection");
         resolve("");
-      }, sleepFor);
+      }, sleepFor * 1000);
     });
     promise.then(() => {
       try {
         createSocketConnection();
       }
       catch(e) {}
-      inConnectAttempt = false;
     });
   }
 }
@@ -72,6 +70,7 @@ export const createSocketConnection = () => {
 
     socket.onopen = function (e) {
       setTimeout(() => {
+        attemptingConnection = false;
         store.setState("loadedConnection", true);
         store.setState("connecting", false);
       }, 1000);
@@ -120,6 +119,7 @@ export const createSocketConnection = () => {
       store.setState("error", 1004);
       console.error(`[error]`, error);
       store.setState("loadedConnection", true);
+      attemptingConnection = false;
       //throw new Error(ErrorTypes["1004"]);
     };
 
