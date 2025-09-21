@@ -269,6 +269,7 @@ export default {
           m = this.messageList.toReversed().find(
             (m) => m.groupId === groupId
           ) || message;
+          //m.type = "stream";
 
           this.stream.rawBuffer += response;
           const repaired = parseIncompleteMarkdown(this.stream.rawBuffer);

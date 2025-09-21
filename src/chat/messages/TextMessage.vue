@@ -37,7 +37,7 @@
     >
       <p
         class="sc-message--text-content"
-        v-html="message.data.text"
+        v-html="mdToHtml(message.data.text)"
       >
       </p>
       <p
@@ -72,6 +72,7 @@
 </template>
 
 <script>
+import { mdToHtml } from "../utils";
 import { mapState } from "../store/";
 import IconBase from "./../components/IconBase.vue";
 import IconEdit from "./../components/icons/IconEdit.vue";
