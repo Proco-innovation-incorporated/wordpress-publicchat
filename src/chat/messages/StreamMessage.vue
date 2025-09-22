@@ -34,11 +34,10 @@
       :messageColors="messageColors"
       :me="me"
     >
-      <p
+      <StreamMarkdown
         class="sc-message--text-content"
-        v-html="mdToHtml(message.data.text)"
-      >
-      </p>
+        :content="message.data.text"
+      />
       <p
         v-if="message.data.meta"
         class="sc-message--meta"
@@ -53,25 +52,11 @@
         edited
       </p>
     </slot>
-    <!-- disabled for public chat
-    <div class="sc-message--atachments">
-      <div
-        v-for="attachment in message.data.attachments"
-        :class="[
-          'attachment-name',
-          { 'non-clickable-attachment': !attachment.url },
-        ]"
-        @click="downloadAttachment(attachment)"
-      >
-        {{ attachment.filename }}
-      </div>
-    </div>
-    -->
   </div>
 </template>
 
 <script>
-import { mdToHtml } from "../utils";
+import { StreamMarkdown } from 'streamdown-vue';
 import { mapState } from "../store/";
 import IconBase from "./../components/IconBase.vue";
 import IconEdit from "./../components/icons/IconEdit.vue";

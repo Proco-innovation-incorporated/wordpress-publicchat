@@ -12,7 +12,7 @@ let attemptingConnection = false;
 
 export const reconnect = (connectNow=false) => {
   if (attemptingConnection) {
-    console.info("Already attempting Websocket connection. Skipping");
+    console.debug("Already attempting Websocket connection. Skipping");
     return;
   }
   else if (connectAttempt >= maxAttempts) {
@@ -38,7 +38,7 @@ export const reconnect = (connectNow=false) => {
       backoffFactor * Math.pow(2, connectAttempt),
       maxBackoffSleep
     );
-    console.log("Backing off before retrying Websocket connection", connectAttempt, sleepFor);
+    console.debug("Backing off before retrying Websocket connection", connectAttempt, sleepFor);
     const promise = new Promise((resolve) => {
       setTimeout(() => {
         console.log("Retrying Websocket connection");

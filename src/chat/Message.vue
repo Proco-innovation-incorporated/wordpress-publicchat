@@ -24,8 +24,9 @@
           }"
         ></div>
       </slot>
-      <TextMessage
-        v-if="message.type === 'text' && !isEmoji"
+
+      <StreamMessage
+        v-if="(message.type === 'stream' || message.type === 'text') && !isEmoji"
         :message="message"
         :message-colors="messageColors"
         :message-styling="messageStyling"
@@ -35,7 +36,33 @@
           <slot
             name="text-message-body"
             :message="scopedProps.message"
-            :messageText="scopedProps.messageText"
+            :messageColors="scopedProps.messageColors"
+            :me="scopedProps.me"
+          >
+          </slot>
+        </template>
+        <template v-slot:text-message-toolbox="scopedProps">
+          <slot
+            name="text-message-toolbox"
+            :message="scopedProps.message"
+            :me="scopedProps.me"
+          >
+          </slot>
+        </template>
+      </StreamMessage>
+
+      <!--
+      <TextMessage
+        v-else-if="message.type === 'text' && !isEmoji"
+        :message="message"
+        :message-colors="messageColors"
+        :message-styling="messageStyling"
+        @remove="$emit('remove')"
+      >
+        <template v-slot:default="scopedProps">
+          <slot
+            name="text-message-body"
+            :message="scopedProps.message"
             :messageColors="scopedProps.messageColors"
             :me="scopedProps.me"
           >
@@ -50,10 +77,13 @@
           </slot>
         </template>
       </TextMessage>
+      -->
+
       <EmojiMessage
         v-else-if="isEmoji"
         :data="{ emoji:  message.data.emoji ?? emojiSymbols[message.data.text] }"
       />
+
       <!-- disabled for public chat
       <FileMessage
         v-else-if="message.type === 'file'"
@@ -61,10 +91,12 @@
         :message-colors="messageColors"
       />
       -->
+
       <TypingMessage
         v-else-if="message.type === 'typing'"
         :message-colors="messageColors"
       />
+
       <SystemMessage
         v-else-if="message.type === 'system'"
         :data="message.data"
@@ -72,12 +104,14 @@
       >
         <slot name="system-message-body" :message="message.data"> </slot>
       </SystemMessage>
+
     </div>
   </div>
 </template>
 
 <script>
-import TextMessage from "./messages/TextMessage.vue";
+import StreamMessage from "./messages/StreamMessage.vue";
+//import TextMessage from "./messages/TextMessage.vue";
 import FileMessage from "./messages/FileMessage.vue";
 import EmojiMessage from "./messages/EmojiMessage.vue";
 import TypingMessage from "./messages/TypingMessage.vue";
@@ -87,7 +121,8 @@ import userIcon from "./assets/user-icon.svg";
 
 export default {
   components: {
-    TextMessage,
+    StreamMessage,
+    //TextMessage,
     FileMessage,
     EmojiMessage,
     TypingMessage,

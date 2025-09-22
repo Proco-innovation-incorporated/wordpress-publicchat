@@ -269,13 +269,15 @@ export default {
           m = this.messageList.toReversed().find(
             (m) => m.groupId === groupId
           ) || message;
-          //m.type = "stream";
+          m.type = "stream";
 
           this.stream.rawBuffer += response;
           const repaired = parseIncompleteMarkdown(this.stream.rawBuffer);
           const blocks = parseBlocks(repaired);
+          //console.log(blocks);
           m.data.text = blocks.join('');
-          console.debug(m.data.text);
+          console.log(m.data.text);
+
           if (m !== message) {
             m.data.attachments.push(...message.data.attachments);
           }
