@@ -24,7 +24,7 @@
     "node-emoji": "^2.1.3",
     "normalize.css": "^8.0.1",
     "socket.io-client": "^4.7.5",
-    "streamdown-vue": "^1.0.20",
+    "streamdown-vue": "^1.0.21",
     "tiny-emitter": "^2.1.0",
     "unplugin-auto-import": "^0.17.6",
     "unplugin-vue-define-options": "^1.4.5",

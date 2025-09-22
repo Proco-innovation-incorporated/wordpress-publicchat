@@ -234,16 +234,20 @@ export default {
       }
 
       if (!event.msg_type || this.types[event.msg_type]) {
+        const media_urls = (
+          event.media_urls?.map(
+            (i) => getMediaMessage(`bot`, event.id, i.url)
+          ) || []
+        );
+
         // merge event.response and event.citations
         // with HTML given target="_blank"
         let response = event.response;
-        /*
         for (const citationObj of event.citations) {
           const citationNum = citationObj.anchor.split(":")[1].split("]")[0];
           const link = `<a target="_blank" class="citation" href="${citationObj.url}">[${citationNum}]</a>`;
           response = response.replace(citationObj.anchor, link);
         }
-        */
 
         let message = Object.assign(
           {},
@@ -262,57 +266,50 @@ export default {
         );
 
         const isStreaming = extras.message?.streaming === true;
-
-        let m = message;
         if (isStreaming) {
+          message.type = "stream";
           const groupId = extras.message.group_id;
 
           // use the last text message with same groupId
-          m = this.messageList.toReversed().find(
+          const idx = this.messageList.findLastIndex(
             (m) => m.groupId === groupId
-          ) || message;
-          m.type = "stream";
+          );
+          const oldMessage = idx !== -1 ? this.messageList[idx] : undefined;
 
           this.stream.rawBuffer += response;
           const repaired = parseIncompleteMarkdown(this.stream.rawBuffer);
           const blocks = parseBlocks(repaired);
           //console.log(blocks);
-          m.data.text = blocks.join('');
-          console.log(m.data.text);
-
-          if (m !== message) {
-            m.data.attachments.push(...message.data.attachments);
-          }
+          message.data.text = blocks.join('');
+          console.log(message.data.text);
 
           // last chunk, end the stream
           if (extras.message.more === false) {
             this.stream.rawBuffer = "";
-            if (m.data.text.lastIndexOf("_") === m.data.text.length - 1) {
-              m.data.text = m.data.text.slice(0, m.data.text.length - 1);
+            if (message.data.text.lastIndexOf("_") === message.data.text.length - 1) {
+              message.data.text = message.data.text.slice(0, message.data.text.length - 1);
             }
           }
-        }
 
-        const media_urls = (
-          event.media_urls?.map(
-            (i) => getMediaMessage(`bot`, event.id, i.url)
-          ) || []
-        );
-
-
-        if (m === message) {
-          this.messageList = [
-            ...this.messageList,
-            m,
-            ...media_urls,
-          ];
+          if (oldMessage) {
+            message.data.attachments = [
+              ...oldMessage.data.attachments,
+              ...message.data.attachments,
+            ];
+            this.messageList.splice(idx, 1, message);
+          }
+          else {
+            this.messageList.push(message);
+          }
         }
         else {
-          this.messageList = [
-            ...this.messageList,
-            ...media_urls,
-          ];
+          this.messageList.push(message);
         }
+
+        this.messageList = [
+          ...this.messageList,
+          ...media_urls,
+        ];
 
         this.showTypingIndicator = false;
       }
