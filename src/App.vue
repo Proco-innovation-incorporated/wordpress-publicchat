@@ -286,9 +286,9 @@ export default {
           // last chunk, end the stream
           if (extras.message.more === false) {
             this.stream.rawBuffer = "";
-            if (message.data.text.lastIndexOf("_") === message.data.text.length - 1) {
-              message.data.text = message.data.text.slice(0, message.data.text.length - 1);
-            }
+            //if (message.data.text.lastIndexOf("_") === message.data.text.length - 1) {
+            //  message.data.text = message.data.text.slice(0, message.data.text.length - 1);
+            //}
           }
 
           if (oldMessage) {
