@@ -237,11 +237,13 @@ export default {
         // merge event.response and event.citations
         // with HTML given target="_blank"
         let response = event.response;
+        /*
         for (const citationObj of event.citations) {
           const citationNum = citationObj.anchor.split(":")[1].split("]")[0];
           const link = `<a target="_blank" class="citation" href="${citationObj.url}">[${citationNum}]</a>`;
           response = response.replace(citationObj.anchor, link);
         }
+        */
 
         let message = Object.assign(
           {},

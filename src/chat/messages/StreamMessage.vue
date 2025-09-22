@@ -1,5 +1,6 @@
 <template>
   <div class="sc-message--text" :style="messageColors">
+    <!--
     <template>
       <div
         class="sc-message--toolbox"
@@ -29,6 +30,8 @@
         <slot name="text-message-toolbox" :message="message" :me="me"> </slot>
       </div>
     </template>
+    -->
+
     <slot
       :message="message"
       :messageColors="messageColors"

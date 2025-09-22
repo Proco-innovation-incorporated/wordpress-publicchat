@@ -73,6 +73,7 @@ export const createSocketConnection = () => {
         attemptingConnection = false;
         store.setState("loadedConnection", true);
         store.setState("connecting", false);
+        store.setState("error", null);
       }, 1000);
       console.debug("[socket] Connected");
       store.setSocket(socket);

@@ -41,6 +41,7 @@
           >
           </slot>
         </template>
+        <!--
         <template v-slot:text-message-toolbox="scopedProps">
           <slot
             name="text-message-toolbox"
@@ -49,6 +50,7 @@
           >
           </slot>
         </template>
+        -->
       </StreamMessage>
 
       <!--

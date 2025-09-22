@@ -46,7 +46,6 @@
         <slot
           name="text-message-body"
           :message="scopedProps.message"
-          :messageText="scopedProps.messageText"
           :messageColors="scopedProps.messageColors"
           :me="scopedProps.me"
         >
