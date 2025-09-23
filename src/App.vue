@@ -58,9 +58,9 @@
 </template>
 
 <script>
+import { mdToHtml } from "./chat/utils";
 import { parseBlocks, parseIncompleteMarkdown } from 'streamdown-vue';
 
-//import availableColors from "./colors";
 import { invertColor }  from "./colors";
 import { emitter } from "./chat/event/index.js";
 import store, { mapState, sendSocketMessage } from "./chat/store/index.js";
@@ -120,9 +120,6 @@ export default {
       newMessagesCount: 0,
       isChatOpen: false,
       showTypingIndicator: true,
-      //colors: null,
-      //availableColors,
-      //chosenColor: null,
       colors: {
         errorInfo: {
           bg: '#ffffff',
@@ -165,7 +162,6 @@ export default {
         user: "me",
         bot: "bot",
       },
-      //messageListCopy: [],
       stream: {
         rawBuffer: "",
       },
@@ -190,7 +186,6 @@ export default {
     },
   },
   created() {
-    //this.setColor("blue");
   },
   mounted() {
     emitter.$on("onmessage", (event) => {
@@ -254,7 +249,7 @@ export default {
           {
             type: "text",
             data: {
-              text: response,
+              text: mdToHtml(response),
               attachments: event?.attachments || [],
             },
             author: this.types[event.msg_type] || `bot`,
@@ -280,7 +275,7 @@ export default {
           const repaired = parseIncompleteMarkdown(this.stream.rawBuffer);
           const blocks = parseBlocks(repaired);
           //console.log(blocks);
-          message.data.text = blocks.join('');
+          message.data.text = mdToHtml(blocks.join(''));
           console.log(message.data.text);
 
           // last chunk, end the stream

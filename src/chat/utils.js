@@ -20,11 +20,11 @@ const md = markdownit({
 // Pass in options if we want to transform elements or add classes
 export function mdToHtml(commonmark, options = {linksNewTab: true}) {
   if (!commonmark) return '<div class="markdown"></div>';
-  console.log("commonmark-request: ", commonmark)
+  console.log("commonmark-request", commonmark)
   
   // md -> html
   const html = md.render(commonmark)
-  console.debug("html: ", html)
+  console.debug("html", html)
 
   // Check options
   DOMPurify.removeAllHooks?.();
@@ -46,7 +46,7 @@ export function mdToHtml(commonmark, options = {linksNewTab: true}) {
       ADD_TAGS: ["s", "sup", "sub"],
       ADD_ATTR: ['class','target','rel'] // Need this for later, so applied styles stay
   })
-  console.debug("sanitized: ", santized)
+  console.debug("sanitized", santized)
 
   return `<div class="markdown">${santized}</div>`
 }

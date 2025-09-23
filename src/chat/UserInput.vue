@@ -91,7 +91,7 @@
               <IconSend />
             </UserInputButton>
             <Loader
-              class="sc-user-inpu--loader"
+              class="sc-user-input--loader"
               :isLoading="isMessageSending"
             ></Loader>
           </div>

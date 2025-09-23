@@ -25,37 +25,8 @@
         ></div>
       </slot>
 
-      <StreamMessage
-        v-if="(message.type === 'stream' || message.type === 'text') && !isEmoji"
-        :message="message"
-        :message-colors="messageColors"
-        :message-styling="messageStyling"
-        @remove="$emit('remove')"
-      >
-        <template v-slot:default="scopedProps">
-          <slot
-            name="text-message-body"
-            :message="scopedProps.message"
-            :messageColors="scopedProps.messageColors"
-            :me="scopedProps.me"
-          >
-          </slot>
-        </template>
-        <!--
-        <template v-slot:text-message-toolbox="scopedProps">
-          <slot
-            name="text-message-toolbox"
-            :message="scopedProps.message"
-            :me="scopedProps.me"
-          >
-          </slot>
-        </template>
-        -->
-      </StreamMessage>
-
-      <!--
       <TextMessage
-        v-else-if="message.type === 'text' && !isEmoji"
+        v-if="(message.type === 'stream' || message.type === 'text') && !isEmoji"
         :message="message"
         :message-colors="messageColors"
         :message-styling="messageStyling"
@@ -79,7 +50,6 @@
           </slot>
         </template>
       </TextMessage>
-      -->
 
       <EmojiMessage
         v-else-if="isEmoji"
@@ -112,8 +82,7 @@
 </template>
 
 <script>
-import StreamMessage from "./messages/StreamMessage.vue";
-//import TextMessage from "./messages/TextMessage.vue";
+import TextMessage from "./messages/TextMessage.vue";
 import FileMessage from "./messages/FileMessage.vue";
 import EmojiMessage from "./messages/EmojiMessage.vue";
 import TypingMessage from "./messages/TypingMessage.vue";
@@ -123,8 +92,7 @@ import userIcon from "./assets/user-icon.svg";
 
 export default {
   components: {
-    StreamMessage,
-    //TextMessage,
+    TextMessage,
     FileMessage,
     EmojiMessage,
     TypingMessage,
