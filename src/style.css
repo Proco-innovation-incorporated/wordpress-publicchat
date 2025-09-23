@@ -113,7 +113,7 @@ button:focus-visible {
   font-weight: 300;
   font-size: 14px;
   line-height: 1.4;
-  //white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   -webkit-font-smoothing: subpixel-antialiased;
 }
 
@@ -136,8 +136,8 @@ button:focus-visible {
 }
 
 .sc-message--content.sent .sc-message--file-text {
-  color: white;
-  background-color: #4e8cff;
+  color: var(--ezee-public-chat--brand-text-color);
+  background-color: var(--ezee-public-chat--brand-color);
   word-wrap: break-word;
 }
 
@@ -165,7 +165,7 @@ button:focus-visible {
   font-weight: 300;
   font-size: 12px;
   line-height: 1.2;
-  //white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   -webkit-font-smoothing: subpixel-antialiased;
   font-style: italic;
   opacity: 0.55;
@@ -190,7 +190,7 @@ button:focus-visible {
 
   .sc-message--text-content {
     margin: 0;
-    //white-space: pre-wrap;
+    /*white-space: pre-wrap;*/
 
     p {
       margin: 0 !important;
@@ -244,10 +244,13 @@ button:focus-visible {
 }
 
 .sc-message--content.sent .sc-message--text {
-  color: white;
-  background-color: #4e8cff;
+  color: var(--ezee-public-chat--brand-text-color);
+  background-color: var(--ezee-public-chat--brand-color);
   max-width: calc(100% - 120px);
   word-wrap: break-word;
+  a {
+    color: inherit;
+  }
 }
 
 .sc-message--content.received .sc-message--text {
@@ -631,7 +634,7 @@ a.chatLink {
   padding: 18px;
   font-size: 15px;
   line-height: 1.33;
-  //white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   word-wrap: break-word;
   color: #565867;
   -webkit-font-smoothing: antialiased;
@@ -775,7 +778,7 @@ a.chatLink {
   padding: 18px;
   font-size: 15px;
   line-height: 1.33;
-  //white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   word-wrap: break-word;
   color: #565867;
   -webkit-font-smoothing: antialiased;
