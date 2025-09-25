@@ -69,7 +69,7 @@ export function processCitations(html, citations) {
   const messageWithCitations = html.replace(/\[\[cite:(\d+)\]\]/g, (match, numStr) => {
     // get the citation
     const citation = citations[match];
-    if(!citation) return match
+    if (!citation) return "";
 
     const emoji = citation.page ? '📄' : citation.timestamp ? '🎬' : '🌐'
 
