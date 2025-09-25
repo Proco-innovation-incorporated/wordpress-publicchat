@@ -85,7 +85,7 @@ import FileMessage from "./messages/FileMessage.vue";
 import EmojiMessage from "./messages/EmojiMessage.vue";
 import TypingMessage from "./messages/TypingMessage.vue";
 import SystemMessage from "./messages/SystemMessage.vue";
-import userIcon from "./assets/user-icon.svg";
+import userIcon from "./assets/user-icon.png";
 
 export default {
   components: {
