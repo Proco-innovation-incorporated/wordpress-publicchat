@@ -33,9 +33,9 @@
     </template>
     <template v-slot:text-message-body="scopedProps">
       <p
-        class="sc-message--text-content"
+        class="sc-message--text-content hi-bborie"
         v-html="scopedProps.message.data.text"
-      ></p>
+      />
       <p
         v-if="scopedProps.message.data.meta"
         class="sc-message--meta"
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { mdToHtml } from "./chat/utils";
+import { mdToHtml, processCitations } from "./chat/utils";
 import { parseBlocks, parseIncompleteMarkdown } from 'streamdown-vue';
 
 import { invertColor }  from "./colors";
@@ -79,6 +79,7 @@ function getMediaMessage(author, id, file) {
     },
   };
 }
+
 function tryToGetMediaFromMessage(message) {
   const imageRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/gi;
   const fileRegex = /(https?:\/\/[^\s]+\.(?:pdf|docx|doc|xls|xlsx))/gi;
@@ -237,24 +238,28 @@ export default {
         );
 
         let response = event.response;
+        const isStreaming = extras.message?.streaming === true;
 
-        // merge event.response and event.citations
-        // with HTML given target="_blank"
-        /*
-        for (const citationObj of (event.citations || [])) {
-          const citationNum = citationObj.anchor.split(":")[1].split("]")[0];
-          const link = `<a target="_blank" class="citation" href="${citationObj.url}">[${citationNum}]</a>`;
-          response = response.replace(citationObj.anchor, link);
-        }
-        */
-
+        let citations = (event.citations || []).reduce(
+          (o, cur) => ({...o, [cur.anchor]: cur}), {}
+        );
+        console.log("citations", event.citations, citations);
         let message = Object.assign(
           {},
           {
             type: "text",
             data: {
-              text: mdToHtml(response),
+              text: (
+                isStreaming
+                  ? response
+                  : (
+                    event.msg_type === "bot"
+                      ? processCitations(mdToHtml(response), citations)
+                      : mdToHtml(response)
+                  )
+              ),
               attachments: event?.attachments || [],
+              citations: citations,
             },
             author: this.types[event.msg_type] || `bot`,
           },
@@ -264,9 +269,9 @@ export default {
           }
         );
 
-        const isStreaming = extras.message?.streaming === true;
         if (isStreaming) {
           message.type = "stream";
+          message.data.more = extras.message.more;
           const groupId = extras.message.group_id;
 
           // use the last text message with same groupId
@@ -279,16 +284,27 @@ export default {
           const repaired = parseIncompleteMarkdown(this.stream.rawBuffer);
           const blocks = parseBlocks(repaired);
           //console.log(blocks);
-          message.data.text = mdToHtml(blocks.join(''));
-          console.log(message.data.text);
+          let cleaned = blocks.join('');
+          //console.log("cleaned", cleaned);
+
 
           // last chunk, end the stream
           if (extras.message.more === false) {
             this.stream.rawBuffer = "";
-            //if (message.data.text.lastIndexOf("_") === message.data.text.length - 1) {
-            //  message.data.text = message.data.text.slice(0, message.data.text.length - 1);
-            //}
+            if (cleaned.lastIndexOf("_") === cleaned.length - 1) {
+              cleaned = cleaned.slice(0, cleaned.length - 1);
+            }
           }
+
+          if (oldMessage) {
+            citations = message.data.citations = {
+              ...oldMessage.data.citations,
+              ...message.data.citations,
+            };
+          }
+
+          message.data.text = processCitations(mdToHtml(cleaned), citations);
+          //console.log(message.data.text);
 
           if (oldMessage) {
             message.data.attachments = [

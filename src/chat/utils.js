@@ -20,7 +20,7 @@ const md = markdownit({
 // Pass in options if we want to transform elements or add classes
 export function mdToHtml(commonmark, options = {linksNewTab: true}) {
   if (!commonmark) return '<div class="markdown"></div>';
-  console.debug("commonmark-request", commonmark)
+  console.debug("markdown", commonmark)
   
   // md -> html
   const html = md.render(commonmark)
@@ -62,4 +62,64 @@ export function purifyHtml(html) {
   DOMPurify.removeAllHooks();
 
   return `<div class="purified">${santized}</div>`
+}
+
+// Transforms the citations in the html response to tooltips
+export function processCitations(html, citations) {
+  // merge event.response and event.citations
+  // with HTML given target="_blank"
+  /*
+  for (const citationObj of (event.citations || [])) {
+    const citationNum = citationObj.anchor.split(":")[1].split("]")[0];
+    const link = `<a target="_blank" class="citation" href="${citationObj.url}">[${citationNum}]</a>`;
+    response = response.replace(citationObj.anchor, link);
+  }
+  */
+
+  console.log("processCitations", citations);
+  const messageWithCitations = html.replace(/\[\[cite:(\d+)\]\]/g, (match, numStr) => {
+    // get the citation
+    const citation = citations[match];
+    if(!citation) return match
+
+    const emoji = citation.page ? '📄' : citation.timestamp ? '🎬' : '🌐'
+
+    // Assume there is only ever a page or a timestamp, not both
+    const title = [
+      `${emoji} <strong>${truncateString(citation.name, 40)}</strong>`,
+      citation.page && `on page(s) ${citation.page}`,
+      !citation.page && citation.timestamp && `at ${formatTime(citation.timestamp)}`
+    ].filter(Boolean).join(' ');
+
+    const num = parseInt(numStr, 10)
+    const el = `
+      <a
+        href="${citation.url}"
+        target="_blank"
+        data-bs-toggle="tooltip"
+        data-bs-placement="auto"
+        data-bs-html="true"
+        title="${title}"
+      >
+        [${num}]
+      </a>
+    `
+    return el
+  })
+
+  return messageWithCitations;
+}
+
+export function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
+export function truncateString(str, length, defaultValue = "") {
+  if (!str) return defaultValue;
+  if (str.length >= length) {
+    return `${str.slice(0, length)}...`;
+  }
+  return str;
 }

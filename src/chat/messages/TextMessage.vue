@@ -1,12 +1,16 @@
 <template>
-  <div class="sc-message--text bborie-text-message" :style="messageColors">
+  <div
+    ref="messageTextRef"
+    class="sc-message--text bborie-text-message"
+    :style="messageColors"
+  >
     <slot
       :message="message"
       :messageColors="messageColors"
       :me="me"
     >
       <p
-        class="sc-message--text-content bborie-text-message-content"
+        class="sc-message--text-content"
         v-html="message.data.text"
       >
       </p>
@@ -18,6 +22,7 @@
         {{ message.data.meta }}
       </p>
     </slot>
+
     <!-- disabled for public chat
     <div class="sc-message--atachments">
       <div
@@ -120,10 +125,23 @@ export default {
       );
     },
   },
+  mounted() {
+    this.processCitations();
+  },
   methods: {
     edit() {
       store.setState("editMessage", this.message);
     },
+    processCitations() {
+      const self = this;
+      const interval = setInterval(
+        () => {
+          console.log(self);
+          clearInterval(interval);
+        },
+        100,
+      );
+    }
   },
 };
 </script>
