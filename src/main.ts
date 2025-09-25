@@ -1,6 +1,4 @@
 /* eslint-disable import/order */
-import 'floating-vue/dist/style.css';
-import FloatingVue from 'floating-vue';
 
 import styles from "./style.css?inline";
 
@@ -69,7 +67,6 @@ declare const window: any;
       shadow.appendChild(chat);
       createApp(App)
         .component("BubbleChat", Launcher)
-        .use(FloatingVue)
         .mount(chat);
     }
   };
