@@ -243,7 +243,6 @@ export default {
         let citations = (event.citations || []).reduce(
           (o, cur) => ({...o, [cur.anchor]: cur}), {}
         );
-        console.log("citations", event.citations, citations);
         let message = Object.assign(
           {},
           {
@@ -549,7 +548,14 @@ button:focus-visible {
   }
 }
 
-:global(.v-popper__popper) {
+:global(div.bs-tooltip-auto) {
   z-index: 1000000;
+  font-size: 14px;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  color: #fff;
 }
 </style>

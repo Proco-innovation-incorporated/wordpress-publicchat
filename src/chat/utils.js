@@ -66,17 +66,6 @@ export function purifyHtml(html) {
 
 // Transforms the citations in the html response to tooltips
 export function processCitations(html, citations) {
-  // merge event.response and event.citations
-  // with HTML given target="_blank"
-  /*
-  for (const citationObj of (event.citations || [])) {
-    const citationNum = citationObj.anchor.split(":")[1].split("]")[0];
-    const link = `<a target="_blank" class="citation" href="${citationObj.url}">[${citationNum}]</a>`;
-    response = response.replace(citationObj.anchor, link);
-  }
-  */
-
-  console.log("processCitations", citations);
   const messageWithCitations = html.replace(/\[\[cite:(\d+)\]\]/g, (match, numStr) => {
     // get the citation
     const citation = citations[match];

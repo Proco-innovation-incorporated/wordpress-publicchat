@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { Tooltip } from "bootstrap";
 import { mapState } from "../store/";
 import IconBase from "./../components/IconBase.vue";
 import IconEdit from "./../components/icons/IconEdit.vue";
@@ -126,18 +127,34 @@ export default {
     },
   },
   mounted() {
-    this.processCitations();
+    if (!this.me) {
+      this.processCitations();
+    }
   },
   methods: {
     edit() {
       store.setState("editMessage", this.message);
     },
     processCitations() {
-      const self = this;
       const interval = setInterval(
         () => {
-          console.log(self);
-          clearInterval(interval);
+          this.$refs.messageTextRef?.querySelectorAll(
+            '[data-bs-toggle="tooltip"]'
+          ).forEach((el) => {
+            if (el._tooltip) return;
+            el._tooltip = new Tooltip(el, {trigger: 'hover'});
+          });
+
+          if (
+            this.message.type === "text" ||
+            (this.message.type === "stream" && this.message.data.more === false)
+          ) {
+            console.log("all done");
+            clearInterval(interval);
+            return;
+          }
+
+          console.log("still polling");
         },
         100,
       );
