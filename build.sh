@@ -47,7 +47,7 @@ NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
 sed -i -E "s/Version: $CURRENT_VERSION/Version: $NEW_VERSION/g" "$PHP_FILE_PATH"
 echo "Version incremented to $NEW_VERSION"
 
-vite build
+vite build --mode "$MODE"
 
 cp ./dist/assets/index-*.js ./chat-plugin/assets/js/widget-app.js
 cp ./dist/assets/index-*.css ./chat-plugin/assets/css/widget-style.css
