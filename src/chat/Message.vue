@@ -18,7 +18,7 @@
             sent: message.author === 'me',
           }"
           :style="{
-            backgroundImage: `url(${chatImageUrl})`,
+            backgroundImage: `url('${chatImageUrl}')`,
           }"
         ></div>
       </slot>
@@ -85,7 +85,6 @@ import FileMessage from "./messages/FileMessage.vue";
 import EmojiMessage from "./messages/EmojiMessage.vue";
 import TypingMessage from "./messages/TypingMessage.vue";
 import SystemMessage from "./messages/SystemMessage.vue";
-import chatIcon from "./assets/chat-icon.svg";
 import userIcon from "./assets/user-icon.svg";
 
 export default {
