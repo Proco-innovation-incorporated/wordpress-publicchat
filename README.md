@@ -1,37 +1,22 @@
-# Wordpress plugin
+# Public Chat component + Wordpress hooks
 
-## Install
+## .env.local
 
-- `nvm use 18.17.0`
-- `npm i`
-- `npm run build`
+Create the following file .env.local
 
-## Dev
-- `npm run dev`
-- start the local access channel server
-- generate the access / refresh token, for example using the /docs endpoint of the AC server
-- open the console in the browser and run:
-```javascript
-window.setupChatData({
-  access_token: "<AC access token>",
-  refresh_token: "<AC refresh token>",
-  org_token: "<org token used to generate the tokens>",
-  userEmail: "<email used to generate the tokens>",
-});
+VITE_PUBLIC_TOKEN='gAAAAABotc_QJlZZsXeET_ORtJabkdds6N71TCI6k6GPxlXZoJWVcG4o6kf7ZW2LL6nNKw2wAS0FFDGfGZiPlWmVf8xpbfm98PV1RNEUoVpm3S1v4t050Scyh_UOY0KROTsv1wKcYi-o3UGbu0JdHqd-UJgaQOcv1Q=='
+#VITE_API_BASE_URL='http://localhost:8889'
+#VITE_WS_BASE_URL='ws://localhost:8889'
+VITE_API_BASE_URL='https://channel.dev.ezeeassist.io'
+VITE_WS_BASE_URL='wss://channel.dev.ezeeassist.io'
+
+## Run locally
+
+```shell
+conda create -n publicchat nodejs
+conda activate publicchat
+
+cd /path/to/wordpress-publicchat
+npm install
+npm run dev
 ```
-
-## Add build to plugin
-- in `main.ts` AND `application-exec.js`, make sure the bot title is correct 
-- run `npm run build:prod` - to build the project for `production` mode
-  - this will result in the `chat-plugin.zip` zip archive being created
-- run `pm run build:dev` - to build the project for `develop` mode
-  - this will result in the `chat-plugin.zip` zip archive being created
-- then you can run `npm run preview` to preview the result of created build
-
- - `npm run build:MODE` will change the Version of the project in `chat-plugin/chat-plugin.php` to patched one
-
- - `npm run build:MODE` will find API urls in files: `chat-plugin/chat-plugin.php` and 
-    `chat-plugin/assets/js/application-exec.js`
-    and change it to *https://channel.dev.ezeeassist.io* for dev and *https://channel.prod.ezeeassist.io* for prod
-
- *MODE* options: `dev`, `prod`

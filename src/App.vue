@@ -33,9 +33,9 @@
     </template>
     <template v-slot:text-message-body="scopedProps">
       <p
-        class="sc-message--text-content"
+        class="sc-message--text-content hi-bborie"
         v-html="scopedProps.message.data.text"
-      ></p>
+      />
       <p
         v-if="scopedProps.message.data.meta"
         class="sc-message--meta"
@@ -58,7 +58,10 @@
 </template>
 
 <script>
-import availableColors from "./colors";
+import { mdToHtml, processCitations } from "./chat/utils";
+import { parseBlocks, parseIncompleteMarkdown } from 'streamdown-vue';
+
+import { invertColor }  from "./colors";
 import { emitter } from "./chat/event/index.js";
 import store, { mapState, sendSocketMessage } from "./chat/store/index.js";
 
@@ -76,6 +79,7 @@ function getMediaMessage(author, id, file) {
     },
   };
 }
+
 function tryToGetMediaFromMessage(message) {
   const imageRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/gi;
   const fileRegex = /(https?:\/\/[^\s]+\.(?:pdf|docx|doc|xls|xlsx))/gi;
@@ -93,25 +97,76 @@ function tryToGetMediaFromMessage(message) {
 export default {
   name: "App",
   data() {
+    const { chatConfig, orgBranding } = mapState(["chatConfig", "orgBranding"]);
+    let logoPathPrefix = chatConfig.value?.logoPathPrefix;
+    if (typeof logoPathPrefix !== "string") {
+      logoPathPrefix = ""
+    }
+
+    const brandColor = orgBranding.value?.highlight_color || '#4e8cff';
+    const textColor = invertColor(brandColor, true);
+    document.documentElement.style.setProperty('--ezee-public-chat--brand-color', brandColor);
+    document.documentElement.style.setProperty('--ezee-public-chat--brand-text-color', textColor);
+
     return {
-      botTitle: window.botTitle || "EzeeAssist Helper",
-      titleImageUrl: window.pluginPath + "/bot-logo.png",
+      botTitle: (
+        orgBranding.value?.bot_name ||
+        chatConfig.value?.botTitle ||
+        "Ezee Assist Agent"
+      ),
+      titleImageUrl: (
+        orgBranding.value?.org_logo ||
+        (logoPathPrefix + "/bot-logo.png")
+      ),
       messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,
-      showTypingIndicator: "",
-      colors: null,
-      availableColors,
-      chosenColor: null,
+      showTypingIndicator: true,
+      colors: {
+        errorInfo: {
+          bg: '#ffffff',
+          text: '#D32F2F',
+        },
+        header: {
+          bg: brandColor,
+          text: textColor,
+          bgError: '#D32F2F'
+        },
+        launcher: {
+          bg: brandColor,
+          bgError: '#D32F2F'
+        },
+        messageList: {
+          bg: '#ffffff'
+        },
+        sentMessage: {
+          bg: brandColor,
+          text: textColor,
+        },
+        receivedMessage: {
+          bg: '#eaeaea',
+          text: '#222222'
+        },
+        userInput: {
+          bg: '#fff',
+          text: '#212121'
+        },
+        userList: {
+          bg: '#fff',
+          text: '#212121'
+        }
+      },
       alwaysScrollToBottom: true,
       messageStyling: true,
       userIsTyping: false,
-      showFile: true,
+      showFile: chatConfig.value?.enableAttachments || false,
       types: {
         user: "me",
         bot: "bot",
       },
-      messageListCopy: [],
+      stream: {
+        rawBuffer: "",
+      },
     };
   },
   computed: {
@@ -133,14 +188,15 @@ export default {
     },
   },
   created() {
-    this.setColor("blue");
   },
   mounted() {
     emitter.$on("onmessage", (event) => {
       if (Array.isArray(event)) {
         event.forEach((item) => {
           Array.isArray(item)
-            ? item.forEach((nested) => this.handleItemSocketAnswer(nested))
+            ? item.forEach(
+              (nested) => this.handleItemSocketAnswer(nested)
+            )
             : this.handleItemSocketAnswer(item);
         });
 
@@ -159,51 +215,116 @@ export default {
   },
   methods: {
     handleItemSocketAnswer(event) {
-      if (event.msg_type === "system" && !event.success) {
-        Object.assign(
-          {},
-          {
-            type: "system",
-            data: {
-              text: event.response,
-              attachments: event?.attachments,
-            },
-            author: `bot`,
-          },
-          { id: event.id }
-        );
-        this.showTypingIndicator = false;
+      const extras = event.extras || {};
+
+      if (event.msg_type === "system") {
+        switch (event.response) {
+          case "ready-for-messages":
+            this.showTypingIndicator = false;
+            break;
+          case "message-received":
+          default:
+            this.showTypingIndicator = true;
+            break;
+        }
+        return;
       }
+
       if (!event.msg_type || this.types[event.msg_type]) {
-        const message = Object.assign(
+        const media_urls = (
+          event.media_urls?.map(
+            (i) => getMediaMessage(`bot`, event.id, i.url)
+          ) || []
+        );
+
+        let response = event.response;
+        const isStreaming = extras.message?.streaming === true;
+
+        let citations = (event.citations || []).reduce(
+          (o, cur) => ({...o, [cur.anchor]: cur}), {}
+        );
+        let message = Object.assign(
           {},
           {
             type: "text",
             data: {
-              text: event.response,
-              attachments: event?.attachments,
+              text: (
+                isStreaming
+                  ? response
+                  : (
+                    event.msg_type === "bot"
+                      ? processCitations(mdToHtml(response), citations)
+                      : mdToHtml(response)
+                  )
+              ),
+              attachments: event?.attachments || [],
+              citations: citations,
             },
             author: this.types[event.msg_type] || `bot`,
           },
-          { id: event.id }
+          {
+            id: event.id,
+            groupId: extras.message?.group_id,
+          }
         );
-        if (this.isChatOpen) {
-          this.messageList = [
-            ...this.messageList,
-            message,
-            ...(event.media_urls?.map((i) =>
-              getMediaMessage(`bot`, event.id, i.url)
-            ) || []),
-          ];
-        } else {
-          this.messageList = [
-            ...this.messageList,
-            message,
-            ...(event.media_urls?.map((i) =>
-              getMediaMessage(`bot`, event.id, i.url)
-            ) || []),
-          ];
+
+        if (isStreaming) {
+          message.type = "stream";
+          message.data.more = extras.message.more;
+          const groupId = extras.message.group_id;
+
+          // use the last text message with same groupId
+          const idx = this.messageList.findLastIndex(
+            (m) => m.groupId === groupId
+          );
+          const oldMessage = idx !== -1 ? this.messageList[idx] : undefined;
+
+          this.stream.rawBuffer += response;
+          const repaired = parseIncompleteMarkdown(this.stream.rawBuffer);
+          const blocks = parseBlocks(repaired);
+          //console.log(blocks);
+          let cleaned = blocks.join('');
+          //console.log("cleaned", cleaned);
+
+
+          // last chunk, end the stream
+          if (extras.message.more === false) {
+            this.stream.rawBuffer = "";
+            if (cleaned.lastIndexOf("_") === cleaned.length - 1) {
+              cleaned = cleaned.slice(0, cleaned.length - 1);
+            }
+          }
+
+          if (oldMessage) {
+            citations = message.data.citations = {
+              ...oldMessage.data.citations,
+              ...message.data.citations,
+            };
+          }
+
+          message.data.text = processCitations(mdToHtml(cleaned), citations);
+          //console.log(message.data.text);
+
+          if (oldMessage) {
+            message.data.attachments = [
+              ...oldMessage.data.attachments,
+              ...message.data.attachments,
+            ];
+            this.messageList.splice(idx, 1, message);
+          }
+          else {
+            this.messageList.push(message);
+          }
         }
+        else {
+          this.messageList.push(message);
+        }
+
+        this.messageList = [
+          ...this.messageList,
+          ...media_urls,
+        ];
+
         this.showTypingIndicator = false;
       }
     },
@@ -234,13 +355,15 @@ export default {
       const messageText =
         message.type === "emoji" ? message.data.emoji : message.data.text;
 
-      const { chatData } = mapState(["chatData"]);
+      const { chatConfig } = mapState(["chatConfig"]);
 
       const attachments = [];
       
+      // TODO review and disable
+      /*
       if (message.files?.length) {
         const access_token = store.tokens.access_token;
-        const presignedUrl = `${window.apiBaseUrl}/api/attachments/create/post-presigned-url/${chatData.value.org_token}?token=${access_token}`;
+        const presignedUrl = `${chatConfig.value.apiBaseUrl}/api/attachments/create/post-presigned-url/${chatConfig.value.org_token}?token=${access_token}`;
         const presignedAttachments = message.files.map(({ name, type }) => {
                 return {
                   content_type: type,
@@ -278,6 +401,7 @@ export default {
           });
         }
       }
+      */
 
       message.data.attachments = attachments.map(({ file_name }) => {
         return {
@@ -306,10 +430,12 @@ export default {
     closeChat() {
       this.isChatOpen = false;
     },
+    /*
     setColor(color) {
       this.colors = this.availableColors[color];
       this.chosenColor = color;
     },
+    */
     showStylingInfo() {
       this.$modal.show("dialog", {
         title: "Info",
@@ -420,5 +546,110 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+</style>
+
+<style>
+.ezee-public-chat-tooltip {
+  --ezee-tooltip-zindex: 1000000;
+  --ezee-tooltip-max-width: 350px;
+  --ezee-tooltip-padding-x: 0.5rem;
+  --ezee-tooltip-padding-y: 0.25rem;
+  --ezee-tooltip-margin: ;
+  --ezee-tooltip-font-size: 0.875rem;
+  --ezee-tooltip-color: #fff;
+  --ezee-tooltip-bg: rgb(0, 0, 0);
+  --ezee-tooltip-border-radius: 5px;
+  --ezee-tooltip-opacity: 0.9;
+  --ezee-tooltip-arrow-width: 0.8rem;
+  --ezee-tooltip-arrow-height: 0.4rem;
+  z-index: var(--ezee-tooltip-zindex);
+  display: block;
+  margin: var(--ezee-tooltip-margin);
+  font-family: var(--ezee-font-sans-serif);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  text-align: start;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-break: normal;
+  white-space: normal;
+  word-spacing: normal;
+  line-break: auto;
+  font-size: var(--ezee-tooltip-font-size);
+  word-wrap: break-word;
+  opacity: 0;
+}
+.ezee-public-chat-tooltip.show {
+  opacity: var(--ezee-tooltip-opacity);
+}
+.ezee-public-chat-tooltip .tooltip-arrow {
+  display: block;
+  width: var(--ezee-tooltip-arrow-width);
+  height: var(--ezee-tooltip-arrow-height);
+}
+.ezee-public-chat-tooltip .tooltip-arrow::before {
+  position: absolute;
+  content: "";
+  border-color: transparent;
+  border-style: solid;
+}
+
+.ezee-public-chat-tooltip[data-popper-placement^=top] .tooltip-arrow {
+  bottom: calc(-1 * var(--ezee-tooltip-arrow-height));
+}
+.ezee-public-chat-tooltip[data-popper-placement^=top] .tooltip-arrow::before {
+  top: -1px;
+  border-width: var(--ezee-tooltip-arrow-height) calc(var(--ezee-tooltip-arrow-width) * 0.5) 0;
+  border-top-color: var(--ezee-tooltip-bg);
+}
+
+/* rtl:begin:ignore */
+.ezee-public-chat-tooltip[data-popper-placement^=right] .tooltip-arrow {
+  left: calc(-1 * var(--ezee-tooltip-arrow-height));
+  width: var(--ezee-tooltip-arrow-height);
+  height: var(--ezee-tooltip-arrow-width);
+}
+.ezee-public-chat-tooltip[data-popper-placement^=right] .tooltip-arrow::before {
+  right: -1px;
+  border-width: calc(var(--ezee-tooltip-arrow-width) * 0.5) var(--ezee-tooltip-arrow-height) calc(var(--ezee-tooltip-arrow-width) * 0.5) 0;
+  border-right-color: var(--ezee-tooltip-bg);
+}
+
+/* rtl:end:ignore */
+.ezee-public-chat-tooltip[data-popper-placement^=bottom] .tooltip-arrow {
+  top: calc(-1 * var(--ezee-tooltip-arrow-height));
+}
+.ezee-public-chat-tooltip[data-popper-placement^=bottom] .tooltip-arrow::before {
+  bottom: -1px;
+  border-width: 0 calc(var(--ezee-tooltip-arrow-width) * 0.5) var(--ezee-tooltip-arrow-height);
+  border-bottom-color: var(--ezee-tooltip-bg);
+}
+
+/* rtl:begin:ignore */
+.ezee-public-chat-tooltip[data-popper-placement^=left] .tooltip-arrow {
+  right: calc(-1 * var(--ezee-tooltip-arrow-height));
+  width: var(--ezee-tooltip-arrow-height);
+  height: var(--ezee-tooltip-arrow-width);
+}
+.ezee-public-chat-tooltip[data-popper-placement^=left] .tooltip-arrow::before {
+  left: -1px;
+  border-width: calc(var(--ezee-tooltip-arrow-width) * 0.5) 0 calc(var(--ezee-tooltip-arrow-width) * 0.5) var(--ezee-tooltip-arrow-height);
+  border-left-color: var(--ezee-tooltip-bg);
+}
+
+/* rtl:end:ignore */
+.ezee-public-chat-tooltip .tooltip-inner {
+  max-width: var(--ezee-tooltip-max-width);
+  padding: var(--ezee-tooltip-padding-y) var(--ezee-tooltip-padding-x);
+  color: var(--ezee-tooltip-color);
+  text-align: center;
+  background-color: var(--ezee-tooltip-bg);
+  border-radius: var(--ezee-tooltip-border-radius);
 }
 </style>

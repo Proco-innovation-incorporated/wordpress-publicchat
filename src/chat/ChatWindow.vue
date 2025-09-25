@@ -1,5 +1,11 @@
 <template>
-  <div class="sc-chat-window" :class="{ opened: isOpen, closed: !isOpen }">
+  <div
+    class="sc-chat-window"
+    :class="{
+      opened: isOpen,
+      closed: !isOpen,
+      full: showFullSizeChat,
+    }">
     <Header
       v-if="showHeader"
       :title="title"
@@ -40,7 +46,6 @@
         <slot
           name="text-message-body"
           :message="scopedProps.message"
-          :messageText="scopedProps.messageText"
           :messageColors="scopedProps.messageColors"
           :me="scopedProps.me"
         >
@@ -61,6 +66,7 @@
     <UserInput
       v-if="!showUserList"
       :show-emoji="showEmoji"
+      :show-feedback="showFeedback"
       :on-submit="onUserInputSubmit"
       :suggestions="getSuggestions()"
       :show-file="showFile"
@@ -74,6 +80,8 @@
 </template>
 
 <script>
+import { mapState } from './store/';
+
 import Header from "./Header.vue";
 import MessageList from "./MessageList.vue";
 import UserInput from "./UserInput.vue";
@@ -88,6 +96,10 @@ export default {
   },
   props: {
     showEmoji: {
+      type: Boolean,
+      default: false,
+    },
+    showFeedback: {
       type: Boolean,
       default: false,
     },
@@ -123,12 +135,16 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    isOpenFull: {
+      type: Boolean,
+      default: () => false,
+    },
     placeholder: {
       type: String,
       required: true,
     },
     showTypingIndicator: {
-      type: String,
+      type: Boolean,
       required: true,
     },
     colors: {
@@ -160,6 +176,13 @@ export default {
       let messages = this.messageList;
       return messages;
     },
+  },
+  setup() {
+    return {
+      ...mapState([
+        'showFullSizeChat',
+      ])
+    }
   },
   methods: {
     handleUserListToggle(showUserList) {

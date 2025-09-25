@@ -10,17 +10,21 @@
     >
       <slot name="user-avatar" :message="message" :user="user">
         <div
-          v-if="message.type !== 'system' && authorName && authorName !== 'me'"
-          v-tooltip="authorName"
+          v-if="message.type !== 'system' && authorName"
+          :tooltip="authorName"
           :title="authorName"
           class="sc-message--avatar"
+          :class="{
+            sent: message.author === 'me',
+          }"
           :style="{
-            backgroundImage: `url(${chatImageUrl})`,
+            backgroundImage: `url('${chatImageUrl}')`,
           }"
         ></div>
       </slot>
+
       <TextMessage
-        v-if="message.type === 'text' && !isEmoji"
+        v-if="(message.type === 'stream' || message.type === 'text') && !isEmoji"
         :message="message"
         :message-colors="messageColors"
         :message-styling="messageStyling"
@@ -30,7 +34,6 @@
           <slot
             name="text-message-body"
             :message="scopedProps.message"
-            :messageText="scopedProps.messageText"
             :messageColors="scopedProps.messageColors"
             :me="scopedProps.me"
           >
@@ -45,19 +48,25 @@
           </slot>
         </template>
       </TextMessage>
+
       <EmojiMessage
         v-else-if="isEmoji"
         :data="{ emoji:  message.data.emoji ?? emojiSymbols[message.data.text] }"
       />
+
+      <!-- disabled for public chat
       <FileMessage
         v-else-if="message.type === 'file'"
         :data="message.data"
         :message-colors="messageColors"
       />
+      -->
+
       <TypingMessage
         v-else-if="message.type === 'typing'"
         :message-colors="messageColors"
       />
+
       <SystemMessage
         v-else-if="message.type === 'system'"
         :data="message.data"
@@ -65,6 +74,7 @@
       >
         <slot name="system-message-body" :message="message.data"> </slot>
       </SystemMessage>
+
     </div>
   </div>
 </template>
@@ -75,7 +85,7 @@ import FileMessage from "./messages/FileMessage.vue";
 import EmojiMessage from "./messages/EmojiMessage.vue";
 import TypingMessage from "./messages/TypingMessage.vue";
 import SystemMessage from "./messages/SystemMessage.vue";
-import chatIcon from "./assets/chat-icon.svg";
+import userIcon from "./assets/user-icon.png";
 
 export default {
   components: {
@@ -120,7 +130,7 @@ export default {
       return this.user && this.user.name;
     },
     chatImageUrl() {
-      return (this.user && this.user.imageUrl) || chatIcon;
+      return (this.user && this.user.imageUrl) || userIcon;
     },
     messageColors() {
       return this.message.author === "me"

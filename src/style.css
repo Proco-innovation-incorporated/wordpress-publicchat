@@ -29,8 +29,8 @@ body {
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
+h1, h2, h3, h4, h5, h6 {
+  margin: 1rem auto !important;
   line-height: 1.1;
 }
 
@@ -113,7 +113,7 @@ button:focus-visible {
   font-weight: 300;
   font-size: 14px;
   line-height: 1.4;
-  white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   -webkit-font-smoothing: subpixel-antialiased;
 }
 
@@ -136,8 +136,8 @@ button:focus-visible {
 }
 
 .sc-message--content.sent .sc-message--file-text {
-  color: white;
-  background-color: #4e8cff;
+  color: var(--ezee-public-chat--brand-text-color);
+  background-color: var(--ezee-public-chat--brand-color);
   word-wrap: break-word;
 }
 
@@ -165,7 +165,7 @@ button:focus-visible {
   font-weight: 300;
   font-size: 12px;
   line-height: 1.2;
-  white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   -webkit-font-smoothing: subpixel-antialiased;
   font-style: italic;
   opacity: 0.55;
@@ -180,19 +180,30 @@ button:focus-visible {
 }
 
 .sc-message--text {
-  padding: 5px !important;
+  padding: 5px 10px !important;
   border-radius: 6px;
   font-weight: 300;
   font-size: 14px;
   line-height: 1.4;
   position: relative;
   -webkit-font-smoothing: subpixel-antialiased;
+
+  .sc-message--text-content {
+    margin: 0;
+    /*white-space: pre-wrap;*/
+
+    p {
+      margin: 0 !important;
+    }
+  }
 }
 
+/*
 .sc-message--text ::v-deep .sc-message--text-content {
   margin: 0;
   white-space: pre-wrap;
 }
+*/
 
 .sc-message--text:hover .sc-message--toolbox {
   left: -20px;
@@ -233,10 +244,13 @@ button:focus-visible {
 }
 
 .sc-message--content.sent .sc-message--text {
-  color: white;
-  background-color: #4e8cff;
+  color: var(--ezee-public-chat--brand-text-color);
+  background-color: var(--ezee-public-chat--brand-color);
   max-width: calc(100% - 120px);
   word-wrap: break-word;
+  a {
+    color: inherit;
+  }
 }
 
 .sc-message--content.received .sc-message--text {
@@ -291,7 +305,7 @@ a.chatLink {
 }
 
 .sc-chat-window {
-  width: 370px;
+  width: 400px;
   height: calc(100% - 120px);
   max-height: 590px;
   position: fixed;
@@ -304,10 +318,14 @@ a.chatLink {
   flex-direction: column;
   justify-content: space-between;
   border-radius: 10px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   animation: fadeIn;
   animation-duration: 0.3s;
   animation-timing-function: ease-in-out;
+}
+
+.sc-chat-window.full {
+  width: min(800px, 50vw);
 }
 
 .sc-chat-window.closed {
@@ -350,6 +368,10 @@ a.chatLink {
     transition: 0.1s ease-in-out;
   }
 
+  .sc-chat-window.full {
+    width: 100%;
+  }
+
   .sc-chat-window.closed {
     bottom: 0px;
   }
@@ -370,7 +392,7 @@ a.chatLink {
   /*border-radius: 50%;*/
   align-self: center;
   padding: 10px;
-  height: 35px !important;
+  height: 40px !important;
   /*width: 60px !important; skip for current plugin*/
 }
 
@@ -382,26 +404,35 @@ a.chatLink {
   font-size: 20px;
 }
 
-.sc-header--close-button {
+
+.sc-header--button {
   width: 40px;
   align-self: center;
   height: 40px;
-  margin-right: 10px;
   box-sizing: border-box;
   cursor: pointer;
   border-radius: 5px;
   margin-left: auto;
 }
 
-.sc-header--close-button:hover {
+.sc-header--button:hover {
   box-shadow: 0px 2px 5px rgba(0, 0, 1, 0.1);
 }
 
-.sc-header--close-button img {
+.sc-header--button img {
   width: 100%;
   height: 100%;
   padding: 13px;
   box-sizing: border-box;
+}
+
+.sc-header--button.open-full img,
+.sc-header--button.close-full img {
+  padding: 10px;
+}
+
+.sc-header--button.close {
+  margin-right: 10px;
 }
 
 @media (max-width: 450px) {
@@ -529,26 +560,28 @@ a.chatLink {
 }
 
 .sc-message--content.sent {
-  justify-content: flex-end;
+  flex-direction: row-reverse;
 }
 
 .sc-message--content.system {
   justify-content: center;
 }
 
-.sc-message--content.sent .sc-message--avatar {
-  display: none;
-}
-
 .sc-message--avatar {
   align-self: baseline;
   background-repeat: no-repeat;
   background-size: 100%;
-  background-position: center;
+  background-position: center center;
   min-width: 30px;
   min-height: 30px;
-  border-radius: 50%;
+}
+
+.sc-message--content.received .sc-message--avatar {
   margin-right: 15px;
+}
+
+.sc-message--content.sent .sc-message--avatar {
+  margin-left: 15px;
 }
 
 .sc-message--meta {
@@ -556,124 +589,6 @@ a.chatLink {
   margin-bottom: 0px;
   color: white;
   text-align: center;
-}
-
-.tooltip {
-  display: block !important;
-  z-index: 10000;
-}
-
-.tooltip .tooltip-inner {
-  background: black;
-  color: white;
-  border-radius: 16px;
-  padding: 5px 10px 4px;
-}
-
-.tooltip .tooltip-arrow {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  position: absolute;
-  margin: 5px;
-  border-color: black;
-  z-index: 1;
-}
-
-.tooltip[x-placement^="top"] {
-  margin-bottom: 5px;
-}
-
-.tooltip[x-placement^="top"] .tooltip-arrow {
-  border-width: 5px 5px 0 5px;
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
-  border-bottom-color: transparent !important;
-  bottom: -5px;
-  left: calc(50% - 5px);
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.tooltip[x-placement^="bottom"] {
-  margin-top: 5px;
-}
-
-.tooltip[x-placement^="bottom"] .tooltip-arrow {
-  border-width: 0 5px 5px 5px;
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
-  border-top-color: transparent !important;
-  top: -5px;
-  left: calc(50% - 5px);
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.tooltip[x-placement^="right"] {
-  margin-left: 5px;
-}
-
-.tooltip[x-placement^="right"] .tooltip-arrow {
-  border-width: 5px 5px 5px 0;
-  border-left-color: transparent !important;
-  border-top-color: transparent !important;
-  border-bottom-color: transparent !important;
-  left: -5px;
-  top: calc(50% - 5px);
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.tooltip[x-placement^="left"] {
-  margin-right: 5px;
-}
-
-.tooltip[x-placement^="left"] .tooltip-arrow {
-  border-width: 5px 0 5px 5px;
-  border-top-color: transparent !important;
-  border-right-color: transparent !important;
-  border-bottom-color: transparent !important;
-  right: -5px;
-  top: calc(50% - 5px);
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.tooltip[aria-hidden="true"] {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.15s, visibility 0.15s;
-}
-
-.tooltip[aria-hidden="false"] {
-  visibility: visible;
-  opacity: 1;
-  transition: opacity 0.15s;
-}
-
-.tooltip.info .tooltip-inner {
-  background: rgba(0, 68, 153, 0.9);
-  color: white;
-  padding: 24px;
-  border-radius: 5px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
-}
-
-.tooltip.info .tooltip-arrow {
-  border-color: rgba(0, 68, 153, 0.9);
-}
-
-.tooltip.popover .popover-inner {
-  background: #f9f9f9;
-  color: black;
-  padding: 24px;
-  border-radius: 5px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
-}
-
-.tooltip.popover .popover-arrow {
-  border-color: #f9f9f9;
 }
 
 .sc-message-list {
@@ -719,7 +634,7 @@ a.chatLink {
   padding: 18px;
   font-size: 15px;
   line-height: 1.33;
-  white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   word-wrap: break-word;
   color: #565867;
   -webkit-font-smoothing: antialiased;
@@ -863,7 +778,7 @@ a.chatLink {
   padding: 18px;
   font-size: 15px;
   line-height: 1.33;
-  white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   word-wrap: break-word;
   color: #565867;
   -webkit-font-smoothing: antialiased;
@@ -1033,7 +948,7 @@ input[type="file"] {
   transform: scale(1.4);
 }
 
-.spiner-wrapper {
+.spinner-wrapper {
   background: var(--gray_400);
   top: 0;
   left: 0;
@@ -1045,25 +960,25 @@ input[type="file"] {
   align-items: center;
 }
 
-.spiner-wrapper img {
+.spinner-wrapper img {
   width: 220px;
   height: 248px;
 }
 
-.spiner-wrapper.spiner-wrapper__page {
+.spinner-wrapper.spinner-wrapper__page {
   position: fixed;
 }
 
-.spiner-wrapper.spiner-wrapper__local {
+.spinner-wrapper.spinner-wrapper__local {
   position: absolute;
 }
 
-.spiner-wrapper.spiner-wrapper__local img {
+.spinner-wrapper.spinner-wrapper__local img {
   width: 80px;
   height: 100px;
 }
 
-.sc-user-inpu--loader.spiner-wrapper.spiner-wrapper__local img {
+.sc-user-input--loader.spinner-wrapper.spinner-wrapper__local img {
   width: 40px;
   margin-right: 30px;
 }

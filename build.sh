@@ -5,7 +5,7 @@ while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
 SCRIPTDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 # Default mode
-MODE="dev"
+MODE="development"
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
@@ -19,7 +19,7 @@ done
 echo "Building in $MODE mode..."
 
 # Determine the correct API base URL
-if [ "$MODE" == "prod" ]; then
+if [ "$MODE" == "production" ]; then
   API_URL="https://channel.prod.ezeeassist.io"
 else
   API_URL="https://channel.dev.ezeeassist.io"
@@ -47,10 +47,10 @@ NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
 sed -i -E "s/Version: $CURRENT_VERSION/Version: $NEW_VERSION/g" "$PHP_FILE_PATH"
 echo "Version incremented to $NEW_VERSION"
 
-vite build
+vite build --mode "$MODE"
 
-mv ./dist/assets/index-*.js ./chat-plugin/assets/js/widget-app.js
-mv ./dist/assets/index-*.css ./chat-plugin/assets/css/widget-style.css
+cp ./dist/assets/index-*.js ./chat-plugin/assets/js/widget-app.js
+cp ./dist/assets/index-*.css ./chat-plugin/assets/css/widget-style.css
 
 # Create a release folder based on the version and mode
 RELEASE_DIR="./releases/chat-plugin-$NEW_VERSION-$MODE"

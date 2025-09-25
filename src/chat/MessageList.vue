@@ -26,7 +26,6 @@
         <slot
           name="text-message-body"
           :message="scopedProps.message"
-          :messageText="scopedProps.messageText"
           :messageColors="scopedProps.messageColors"
           :me="scopedProps.me"
         >
@@ -55,6 +54,7 @@
 </template>
 
 <script>
+import { mapState } from './store/';
 import Message from "./Message.vue";
 import chatIcon from "./assets/chat-icon.svg";
 
@@ -72,7 +72,7 @@ export default {
       required: true,
     },
     showTypingIndicator: {
-      type: String,
+      type: Boolean,
       required: true,
     },
     colors: {
@@ -99,6 +99,9 @@ export default {
   updated() {
     if (this.shouldScrollToBottom()) this.$nextTick(this._scrollDown(true));
   },
+  setup() {
+    return mapState(["orgBranding"]);
+  },
   methods: {
     _scrollDown(isSmooth = false) {
       setTimeout(() => {
@@ -119,7 +122,18 @@ export default {
       return this.alwaysScrollToBottom || scrollable;
     },
     profile(author) {
-      return { imageUrl: "", name: "" };
+      switch (author) {
+        case "me":
+          return { imageUrl: "", name: "me" };
+          break;
+        case "bot":
+        default:
+          return {
+            imageUrl: this.orgBranding.bot_icon,
+            name: this.orgBranding.bot_name,
+          };
+          break;
+      }
     },
   },
 };

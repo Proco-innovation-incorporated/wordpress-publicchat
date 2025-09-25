@@ -8,7 +8,7 @@
     <form
       class="sc-user-input"
       :class="{ active: inputActive }"
-      v-if="!error"
+      v-if="!error && !connecting"
       :style="{ background: colors.userInput.bg }"
     >
       <div
@@ -36,7 +36,7 @@
         </div>
         <!--        v-if="showEmoji && !isEditing"-->
         <div
-          v-if="!isMessageSending"
+          v-if="showFeedback && !isMessageSending"
           @click="_handleEmojiPicked('👎')"
           class="sc-user-input--button"
           style="cursor: pointer; margin-right: 10px"
@@ -44,7 +44,7 @@
           👎
         </div>
         <div
-          v-if="!isMessageSending"
+          v-if="showFeedback && !isMessageSending"
           @click="_handleEmojiPicked('👍')"
           class="sc-user-input--button"
           style="cursor: pointer; margin-right: 10px"
@@ -91,13 +91,27 @@
               <IconSend />
             </UserInputButton>
             <Loader
-              class="sc-user-inpu--loader"
+              class="sc-user-input--loader"
               :isLoading="isMessageSending"
             ></Loader>
           </div>
         </div>
       </div>
     </form>
+
+    <div
+      v-else-if="!error && connecting"
+      class="sc-user-input sc-user-error"
+      :style="{
+        background: colors.errorInfo.bg,
+        color: colors.errorInfo.text,
+      }"
+    >
+      <div>
+        Connecting to the server
+      </div>
+    </div>
+
     <div
       v-else
       class="sc-user-input sc-user-error"
@@ -113,6 +127,7 @@
         </a>
       </div>
     </div>
+
   </div>
   <div v-if="files.length" class="files-container">
     <!-- <span class="icon-file-message"
@@ -166,7 +181,7 @@ import IconDeleteAttachment from "./components/icons/IconDeleteAttachment.vue";
 import IconSend from "./components/icons/IconSend.vue";
 import { emitter } from "./event/index.js";
 import { ErrorTypes } from "../error.js";
-import { createSocketConnection } from "./socket/index.js";
+import { reconnect as reconnectNow } from "./socket/index.js";
 
 export default {
   components: {
@@ -181,16 +196,12 @@ export default {
     Loader,
   },
   setup() {
-    const { chatData } = mapState(["chatData"]);
-
     function reconnect() {
-      store.setState("loadedConnection", false);
-      store.setState("error", null);
-      createSocketConnection(chatData.value);
+      reconnectNow(true);
     }
 
     return {
-      ...mapState(["error"]),
+      ...mapState(["error", "connecting"]),
       reconnect,
     };
   },
@@ -214,6 +225,11 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    showFeedback: {
+      type: Boolean,
+      default: () => false,
+    },
+
     suggestions: {
       type: Array,
       default: () => [],

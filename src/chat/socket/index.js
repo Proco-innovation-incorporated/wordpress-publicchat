@@ -1,112 +1,95 @@
-import { ref } from "vue";
-import store from "../store/index.js";
+import store, { mapState }  from "../store/index.js";
 import { emitter } from "../event/index.js";
 import { ErrorTypes } from "../../error.js";
+
+const backoffFactor = 0.1;
+const maxAttempts = 5000;
+const maxBackoffSleep = 30; // seconds
+
 let socket;
-export const createSocketConnection = (params) => {
+let connectAttempt = 0;
+let attemptingConnection = false;
 
-  const tokens = ref({
-    access_token:
-      import.meta.env.MODE === "development"
-        ? localStorage.getItem("access_token") || params.access_token
-        : params.access_token,
-    refresh_token:
-      import.meta.env.MODE === "development"
-        ? localStorage.getItem("refresh_token") || params.refresh_token
-        : params.refresh_token,
-  });
+export const reconnect = (connectNow=false) => {
+  if (attemptingConnection) {
+    console.debug("Already attempting Websocket connection. Skipping");
+    return;
+  }
+  else if (connectAttempt >= maxAttempts) {
+    console.error("Too many consecutive failed attempts. User intervention required");
+    connectAttempt = 0;
+    store.setState("error", 1013);
+    return;
+  }
 
-  store.tokens.access_token = tokens.value.access_token;
-  store.tokens.refresh_token = tokens.value.refresh_token;
+  attemptingConnection = true;
 
-  const refresh = async () => {
-    if (!tokens.value.refresh_token) {
-      store.setState("error", 1000);
-      store.setState("loadedConnection", true);
-      throw new Error(ErrorTypes["1000"]);
-    }
+  store.setState("loadedConnection", false);
+  store.setState("error", null);
+
+  if (connectNow) {
     try {
-      const result = await fetch(
-        `${window.apiBaseUrl}/api/auth/token/refresh?refresh_token=${tokens.value.refresh_token}`
-      ).then((i) => i.json());
-      if (
-        import.meta.env.MODE === "development" &&
-        result?.access_token &&
-        result?.refresh_token
-      ) {
-        localStorage.setItem("access_token", result.access_token);
-        localStorage.setItem("refresh_token", result.refresh_token);
-      }
-
-      if (!result?.access_token && !result?.refresh_token) {
-        store.setState("error", 1002);
-        store.setState("loadedConnection", true);
-        throw new Error(ErrorTypes["1002"]);
-      }
-
-      tokens.value = result;
-      store.tokens.access_token = tokens.value.access_token;
-      store.tokens.refresh_token = tokens.value.refresh_token;
-    } catch (e) {
-      if (e === ErrorTypes["1002"]) return;
-      store.setState("error", 1003);
-      if (import.meta.env.MODE === "development") {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-      }
-      store.setState("loadedConnection", true);
-      throw new Error(ErrorTypes["1003"]);
+      createSocketConnection();
     }
-  };
-  const auth = async () => {
-    await refresh();
+    catch(e) {}
+  }
+  else {
+    const sleepFor = Math.min(
+      backoffFactor * Math.pow(2, connectAttempt),
+      maxBackoffSleep
+    );
+    console.debug("Backing off before retrying Websocket connection", connectAttempt, sleepFor);
+    const promise = new Promise((resolve) => {
+      setTimeout(() => {
+        console.log("Retrying Websocket connection");
+        resolve("");
+      }, sleepFor * 1000);
+    });
+    promise.then(() => {
+      try {
+        createSocketConnection();
+      }
+      catch(e) {}
+    });
+  }
+}
 
-    return createConnection();
-  };
-
-  // const createIntervalBeforeRefresh = (socket) => { will detele after test
-  //   const interval = setInterval(async () => {
-  //     socket.close();
-  //     closeSocketConnection();
-  //     await refresh();
-  //     clearInterval(interval);
-  //     createConnection();
-  //   }, 1000 * 60 * 8)
-  // }
-
+export const createSocketConnection = () => {
   const createConnection = () => {
     if (socket) {
       socket.close();
       socket = null;
     }
 
-    let socketUrlBaseUrl =
-      import.meta.env.MODE === "development"
-        ? window.wsBaseUrl
-        : window.apiBaseUrl;
-
+    const { chatConfig } = mapState(["chatConfig"]);
+    store.setState("connecting", true);
     socket = new WebSocket(
-      `${socketUrlBaseUrl}/api/livechat/in/${params.org_token}?token=${tokens.value.access_token}`
+      `${chatConfig.value.wsBaseUrl}/api/publicchat/in?token=${chatConfig.value.publicToken}&session_id=${store.state.value.sessionId}`
     );
+    connectAttempt++;
 
     socket.onopen = function (e) {
       setTimeout(() => {
+        attemptingConnection = false;
         store.setState("loadedConnection", true);
+        store.setState("connecting", false);
+        store.setState("error", null);
       }, 1000);
-      console.log("[socket] connected");
-      store.setSocket(socket, params.userEmail);
+      console.debug("[socket] Connected");
+      store.setSocket(socket);
+      connectAttempt = 0;
     };
 
     socket.onmessage = function (event) {
       try {
         const msg = JSON.parse(event.data);
-        console.log(
-          `[socket] get message from server: ${JSON.stringify(msg, null, 2)}`
+        console.debug(
+          `[socket] Received Message: ${JSON.stringify(msg, null, 2)}`
         );
         emitter.$emit("onmessage", msg);
       } catch (error) {
         console.error(
-          `[socket] error on message: ${error.message}\noriginal message: ${event.data}`
+          `[socket] Error receiving Message: ${error.message}\noriginal message: ${event.data}`
         );
       }
     };
@@ -114,34 +97,35 @@ export const createSocketConnection = (params) => {
     socket.onclose = function (event) {
       if (event.wasClean) {
         store.setState("error", 1005);
-        console.log(
-          `[close] connection closed clearly, code=${event.code} message=${event.reason}`
+        console.debug(
+          `[close] Connection cleanly closed. code=${event.code} message=${event.reason}`
         );
       } else {
-        // например, сервер убил процесс или сеть недоступна
-        // обычно в этом случае event.code 1006
+        // for example, the server killed the process or the network is unavailable
+        // usually in this case event.code 1006
         store.setState("error", 1001);
         console.error(
-          "[close] connection closed dirty ",
+          "[close] Error cleanly closing Connection",
           event.code,
           event.reason
         );
-        throw new Error(ErrorTypes["1001"]);
+        //throw new Error(ErrorTypes["1001"]);
       }
       // emitting new event so that the interface can update itself
       emitter.$emit("connection-close");
+      reconnect();
     };
 
     socket.onerror = function (error) {
       store.setState("error", 1004);
       console.error(`[error]`, error);
       store.setState("loadedConnection", true);
-      throw new Error(ErrorTypes["1004"]);
+      attemptingConnection = false;
+      //throw new Error(ErrorTypes["1004"]);
     };
 
-    // createIntervalBeforeRefresh(socket) //
     return socket;
   };
 
-  return auth();
+  return createConnection();
 };

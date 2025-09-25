@@ -1,41 +1,19 @@
 <template>
-  <div class="sc-message--text" :style="messageColors">
-    <template>
-      <div
-        class="sc-message--toolbox"
-        :style="{ background: messageColors.backgroundColor }"
-      >
-        <button
-          v-if="showEdition && me && message.id"
-          :disabled="isEditing"
-          @click="edit"
-        >
-          <IconBase
-            :color="isEditing ? 'black' : messageColors.color"
-            width="10"
-            icon-name="edit"
-          >
-            <IconEdit />
-          </IconBase>
-        </button>
-        <button
-          v-if="showDeletion && me && message.id"
-          @click="$emit('remove')"
-        >
-          <IconBase :color="messageColors.color" width="10" icon-name="remove">
-            <IconCross />
-          </IconBase>
-        </button>
-        <slot name="text-message-toolbox" :message="message" :me="me"> </slot>
-      </div>
-    </template>
+  <div
+    ref="messageTextRef"
+    class="sc-message--text bborie-text-message"
+    :style="messageColors"
+  >
     <slot
       :message="message"
-      :messageText="messageText"
       :messageColors="messageColors"
       :me="me"
     >
-      <p class="sc-message--text-content" v-html="message.data.text"></p>
+      <p
+        class="sc-message--text-content"
+        v-html="message.data.text"
+      >
+      </p>
       <p
         v-if="message.data.meta"
         class="sc-message--meta"
@@ -43,14 +21,10 @@
       >
         {{ message.data.meta }}
       </p>
-      <p v-if="message.isEdited" class="sc-message--edited">
-        <IconBase width="10" icon-name="edited">
-          <IconEdit />
-        </IconBase>
-        edited
-      </p>
     </slot>
-    <div class="sc-message-atachments">
+
+    <!-- disabled for public chat
+    <div class="sc-message--atachments">
       <div
         v-for="attachment in message.data.attachments"
         :class="[
@@ -62,17 +36,16 @@
         {{ attachment.filename }}
       </div>
     </div>
+    -->
   </div>
 </template>
 
 <script>
+import { Tooltip } from "bootstrap";
 import { mapState } from "../store/";
 import IconBase from "./../components/IconBase.vue";
 import IconEdit from "./../components/icons/IconEdit.vue";
 import IconCross from "./../components/icons/IconCross.vue";
-import { htmlEscape } from "escape-goat";
-import Autolinker from "autolinker";
-import fmt from "msgdown";
 import store from "../store/";
 
 export default {
@@ -143,20 +116,6 @@ export default {
     };
   },
   computed: {
-    messageText() {
-      const escaped = htmlEscape(this.message.data.text);
-
-      try {
-        return Autolinker.link(this.messageStyling ? fmt(escaped) : escaped, {
-          className: "chatLink",
-          truncate: { length: 50, location: "smart" },
-        });
-      } catch (e) {
-        console.log(e);
-      }
-
-      return escaped;
-    },
     me() {
       return this.message.author === "me";
     },
@@ -167,16 +126,45 @@ export default {
       );
     },
   },
+  mounted() {
+    if (!this.me) {
+      this.processCitations();
+    }
+  },
   methods: {
     edit() {
       store.setState("editMessage", this.message);
     },
+    processCitations() {
+      const interval = setInterval(
+        () => {
+          this.$refs.messageTextRef?.querySelectorAll(
+            '[data-bs-toggle="tooltip"]'
+          ).forEach((el) => {
+            if (el._tooltip) return;
+            el._tooltip = new Tooltip(el, {trigger: 'hover'});
+          });
+
+          if (
+            this.message.type === "text" ||
+            (this.message.type === "stream" && this.message.data.more === false)
+          ) {
+            //console.log("all done");
+            clearInterval(interval);
+            return;
+          }
+
+          //console.log("still polling");
+        },
+        100,
+      );
+    }
   },
 };
 </script>
 
 <style scoped lang="scss">
-.sc-message-atachments {
+.sc-message--attachments {
   img {
     cursor: pointer;
   }

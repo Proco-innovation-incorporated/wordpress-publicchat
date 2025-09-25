@@ -1,51 +1,73 @@
 /* eslint-disable import/order */
 
-import VTooltip from 'v-tooltip';
-import { createApp } from 'vue'
-import styles from './style.css?inline'
-import App from './App.vue'
-import Launcher from './chat/Launcher.vue';
-import store from './chat/store'
-import './chat/socket'
+import styles from "./style.css?inline";
+
+import { createApp } from "vue";
+import App from "./App.vue";
+import Launcher from "./chat/Launcher.vue";
+import store, { loadOrgBranding } from "./chat/store";
+import "./chat/socket";
+
 declare const window: any;
+
 (function (){
-  window.pluginPath = import.meta.env.MODE === 'development' ? '' : '/wp-content/plugins/chat-plugin/assets';
-  window.apiBaseUrl = import.meta.env.MODE === 'development' ? import.meta.env.VITE_API_BASE_URL : '';
-  window.wsBaseUrl = import.meta.env.MODE === 'development' ? import.meta.env.VITE_WS_BASE_URL : '';
-  // before new build, make sure the title is correct
-  window.botTitle = 'WSI AI Assistant';
-  
-  store.setupFirst()
-  const shadowRoot = document.createElement('div')
-  shadowRoot.style.position = 'absolute'
-  shadowRoot.style.zIndex = '100000000000000000'
-  document.body.append(shadowRoot)
-  if(shadowRoot) {
-    const shadow = shadowRoot.attachShadow({mode: 'open'})
-    const style = document.createElement('style');
-    const chat = document.createElement('div');
-    chat.id='chat'
-    style.textContent = styles;
-    shadow.appendChild(style);
-    shadow.appendChild(chat);
-    createApp(App)
-      .component('BubbleChat', Launcher)
-      .use(VTooltip)
-      .mount(chat);
-  
-  }
-  window.setupChatData = ({ access_token, refresh_token, org_token, userEmail, userName, userSurname }: any = {}) => {
-    if(!access_token || !userEmail || !org_token || !refresh_token) {
-      throw new Error('Ezee Assist chat should have client Identificator and email of user.')
+  const isDevMode: boolean = import.meta.env.MODE === "development";
+
+  window.ezee = window.ezee || {};
+
+  store.setupFirst();
+  window.ezee.setupChatConfig = (props: any = {}) => {
+    const config = {
+      ...{
+        publicToken: undefined,
+        botTitle: "EZee Assist Public Agent",
+        apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
+        wsBaseUrl: import.meta.env.VITE_WS_BASE_URL,
+        logoPathPrefix: "",
+        enableAttachments: false,
+      },
+      ...props,
+    };
+    if (config.wsBaseUrl === undefined || config.wsBaseUrl === null) {
+      config.wsBaseUrl = "";
+    }
+
+    if (!config.publicToken) {
+      throw new Error("Ezee Assist Public Agent requires a Public Token");
     }
   
-    store.setState('chatData', {
-      access_token,
-      refresh_token,
-      org_token,
-      userEmail,
-      userName,
-      userSurname
-    })
+    store.setState("chatConfig", {
+      ...config
+    });
+  };
+
+  if (isDevMode && import.meta.env.VITE_PUBLIC_TOKEN) {
+    window.ezee.setupChatConfig({
+      publicToken: import.meta.env.VITE_PUBLIC_TOKEN,
+    });
   }
-})()
+
+  window.ezee.initChat = async () => {
+    await loadOrgBranding();
+
+    const shadowRoot = document.createElement("div");
+    shadowRoot.id = "shadow-root"
+    shadowRoot.className = "shadow-root"
+    shadowRoot.style.position = "absolute";
+    shadowRoot.style.zIndex = "999999";
+    document.body.append(shadowRoot);
+    if (shadowRoot) {
+      const shadow = shadowRoot.attachShadow({mode: "open"});
+      const style = document.createElement("style");
+      const chat = document.createElement("div");
+      chat.id = "chat";
+      chat.class = "chat-root";
+      style.textContent = styles;
+      shadow.appendChild(style);
+      shadow.appendChild(chat);
+      createApp(App)
+        .component("BubbleChat", Launcher)
+        .mount(chat);
+    }
+  };
+})();

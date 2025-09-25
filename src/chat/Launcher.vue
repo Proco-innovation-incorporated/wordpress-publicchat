@@ -1,5 +1,5 @@
 <template>
-  <div v-show="chatData">
+  <div v-show="chatConfig">
     <div
       v-show="showLauncher"
       class="sc-launcher"
@@ -11,8 +11,8 @@
         {{ newMessagesCount }}
       </div>
       <template v-if="loadedConnection">
-        <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" :alt="icons.close.name" />
-        <img v-else class="sc-open-icon" :src="icons.open.img" :alt="icons.open.name" />
+        <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" alt="" />
+        <img v-else class="sc-open-icon" :src="icons.open.img" alt="" />
       </template>
 
       <div v-show="!loadedConnection" style="position: absolute; top:-100%; left: 0; width: 100%; height: 100%">
@@ -27,6 +27,7 @@
       :title="chatWindowTitle"
       :is-open="isOpen"
       :show-emoji="showEmoji"
+      :show-feedback="showFeedback"
       :show-file="showFile"
       :show-header="showHeader"
       :placeholder="placeholder"
@@ -50,7 +51,6 @@
         <slot
           name="text-message-body"
           :message="scopedProps.message"
-          :messageText="scopedProps.messageText"
           :messageColors="scopedProps.messageColors"
           :me="scopedProps.me"
         >
@@ -68,16 +68,19 @@
 </template>
 
 <script>
-import store, {mapState} from './store/'
-import {watch} from 'vue'
-import ChatWindow from './ChatWindow.vue'
+import store, {mapState} from "./store/"
+import {watch} from "vue"
+import ChatWindow from "./ChatWindow.vue"
 
-import CloseIcon from './assets/close-icon.png'
-import OpenIcon from './assets/logo-no-bg.svg'
-import {emitter} from "./event/index.js";
-import {createSocketConnection} from "./socket/index.js";
+import CloseIcon from "./assets/close-icon.png"
+import OpenIcon from "./assets/logo-no-bg.svg"
+import { emitter } from "./event/index.js";
+import { createSocketConnection } from "./socket/index.js";
 import Loader from "./loading-worker/Loader.vue";
-import {finishSpinnerByName, startSpinnerByName} from "./loading-worker";
+import {
+  finishSpinnerByName,
+  startSpinnerByName
+} from "./loading-worker";
 
 export default {
   components: {
@@ -91,16 +94,20 @@ export default {
         return {
           open: {
             img: OpenIcon,
-            name: 'default'
+            name: "default"
           },
           close: {
             img: CloseIcon,
-            name: 'default'
+            name: "default"
           }
         }
       }
     },
     showEmoji: {
+      type: Boolean,
+      default: false
+    },
+    showFeedback: {
       type: Boolean,
       default: false
     },
@@ -146,11 +153,11 @@ export default {
     },
     title: {
       type: String,
-      default: () => ''
+      default: () => ""
     },
     titleImageUrl: {
       type: String,
-      default: () => ''
+      default: () => ""
     },
     onMessageWasSent: {
       type: Function,
@@ -166,54 +173,54 @@ export default {
     },
     placeholder: {
       type: String,
-      default: 'Write a message...'
+      default: "Write a message..."
     },
     showTypingIndicator: {
-      type: String,
-      default: () => ''
+      type: Boolean,
+      required: true,
     },
     colors: {
       type: Object,
       validator: (c) =>
-        'header' in c &&
-        'bg' in c.header &&
-        'text' in c.header &&
-        'launcher' in c &&
-        'bg' in c.launcher &&
-        'messageList' in c &&
-        'bg' in c.messageList &&
-        'sentMessage' in c &&
-        'bg' in c.sentMessage &&
-        'text' in c.sentMessage &&
-        'receivedMessage' in c &&
-        'bg' in c.receivedMessage &&
-        'text' in c.receivedMessage &&
-        'userInput' in c &&
-        'bg' in c.userInput &&
-        'text' in c.userInput,
+        "header" in c &&
+        "bg" in c.header &&
+        "text" in c.header &&
+        "launcher" in c &&
+        "bg" in c.launcher &&
+        "messageList" in c &&
+        "bg" in c.messageList &&
+        "sentMessage" in c &&
+        "bg" in c.sentMessage &&
+        "text" in c.sentMessage &&
+        "receivedMessage" in c &&
+        "bg" in c.receivedMessage &&
+        "text" in c.receivedMessage &&
+        "userInput" in c &&
+        "bg" in c.userInput &&
+        "text" in c.userInput,
       default: function () {
         return {
           header: {
-            bg: '#4e8cff',
-            text: '#ffffff'
+            bg: "#4e8cff",
+            text: "#ffffff"
           },
           launcher: {
-            bg: '#4e8cff'
+            bg: "#4e8cff"
           },
           messageList: {
-            bg: '#ffffff'
+            bg: "#ffffff"
           },
           sentMessage: {
-            bg: '#4e8cff',
-            text: '#ffffff'
+            bg: "#4e8cff",
+            text: "#ffffff"
           },
           receivedMessage: {
-            bg: '#f4f7f9',
-            text: '#ffffff'
+            bg: "#f4f7f9",
+            text: "#ffffff"
           },
           userInput: {
-            bg: '#f4f7f9',
-            text: '#565867'
+            bg: "#f4f7f9",
+            text: "#565867"
           }
         }
       }
@@ -233,13 +240,13 @@ export default {
   },
   computed: {
     chatWindowTitle() {
-      if (this.title !== '') return this.title
+      if (this.title !== "") return this.title
 
-      // if (this.participants.length === 0) return 'You'
-      // if (this.participants.length > 1) return 'You, ' + this.participants[0].name + ' & others'
+      // if (this.participants.length === 0) return "You"
+      // if (this.participants.length > 1) return "You, " + this.participants[0].name + " & others"
 
-      return '';
-      // return 'You & ' + this.participants[0].name
+      return "";
+      // return "You & " + this.participants[0].name
     }
   },
   watch: {
@@ -248,39 +255,40 @@ export default {
       immediate: true,
       handler(props) {
         for (const prop in props) {
-          store.setState(prop, props[prop])
+          store.setState(prop, props[prop]);
         }
-      }
+      },
     }
   },
   setup() {
-    const { chatData, loadedConnection, error } = mapState(['chatData', 'loadedConnection', 'error']);
-
-    watch(chatData, (value) => {
-      if(value) {
-        setTimeout(() => {
-          startSpinnerByName('showLauncher')
-          createSocketConnection(value)
-        }, 0) 
-      }
-    })
-    watch(loadedConnection, (value) => {
-      if(value) {
-        finishSpinnerByName('showLauncher')
-      } else {
-        startSpinnerByName('showLauncher')
-      }
-    })
-    return {
-      chatData,
+    const {
+      chatConfig,
       loadedConnection,
       error
-    }
+    } = mapState(["chatConfig", "loadedConnection", "error"]);
+
+    setTimeout(() => {
+      startSpinnerByName("showLauncher");
+      createSocketConnection();
+    }, 0);
+    watch(loadedConnection, (value) => {
+      if (value) {
+        finishSpinnerByName("showLauncher");
+      } else {
+        startSpinnerByName("showLauncher");
+      }
+    });
+
+    return {
+      chatConfig,
+      loadedConnection,
+      error,
+    };
   },
   methods: {
     openAndFocus() {
-      this.open()
-      emitter.$emit('focusUserInput')
+      this.open();
+      emitter.$emit("focusUserInput");
     }
   }
 }
