@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Chat Plugin
  * Description: A Vue.js-based chat plugin for WordPress.
- * Version: 0.0.26
+ * Version: 0.0.44
  * Author: Ezee Assist
  */
 
@@ -58,7 +58,7 @@ if(!is_divi_builder_active() && !is_admin()) {
       return null;
     }
 
-    $api_url = 'https://channel.dev.ezeeassist.io';
+    $api_url = 'https://channel.prod.ezeeassist.io';
     $url = "$api_url/api/auth/token?org_token=$orgToken&org_secret=$orgSecret&user_id=$client_email";
 
     $ch = curl_init();

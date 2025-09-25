@@ -149,12 +149,12 @@ export default {
             this.message.type === "text" ||
             (this.message.type === "stream" && this.message.data.more === false)
           ) {
-            console.log("all done");
+            //console.log("all done");
             clearInterval(interval);
             return;
           }
 
-          console.log("still polling");
+          //console.log("still polling");
         },
         100,
       );
