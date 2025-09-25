@@ -88,6 +88,7 @@ export function processCitations(html, citations) {
         data-bs-toggle="tooltip"
         data-bs-placement="auto"
         data-bs-html="true"
+        data-bs-custom-class="ezee-public-chat-tooltip"
         title="${title}"
       >
         [${num}]
