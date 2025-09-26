@@ -163,9 +163,12 @@ export default {
       types: {
         user: "me",
         bot: "bot",
+        prompt: "prompt",
+        message: "message",
       },
       stream: {
         rawBuffer: "",
+        inStream: false,
       },
     };
   },
@@ -178,6 +181,9 @@ export default {
     backgroundColor() {
       return this.chosenColor === "dark" ? this.colors.messageList.bg : "#fff";
     },
+    inStream() {
+      return this.stream.inStream;
+    },
     ...mapState(["error"]),
   },
   watch: {
@@ -186,6 +192,9 @@ export default {
         this.messageList = [];
       }
     },
+    //inStream(newValue, oldValue) {
+    //  console.log(oldValue, "->",newValue);
+    //},
   },
   created() {
   },
@@ -252,7 +261,7 @@ export default {
                 isStreaming
                   ? response
                   : (
-                    event.msg_type === "bot"
+                    event.msg_type !== "me"
                       ? processCitations(mdToHtml(response), citations)
                       : mdToHtml(response)
                   )
@@ -260,7 +269,7 @@ export default {
               attachments: event?.attachments || [],
               citations: citations,
             },
-            author: this.types[event.msg_type] || `bot`,
+            author: this.types[event.msg_type] || "bot",
           },
           {
             id: event.id,
@@ -269,6 +278,7 @@ export default {
         );
 
         if (isStreaming) {
+          this.stream.inStream = true;
           message.type = "stream";
           message.data.more = extras.message.more;
           const groupId = extras.message.group_id;
@@ -290,6 +300,7 @@ export default {
           // last chunk, end the stream
           if (extras.message.more === false) {
             this.stream.rawBuffer = "";
+            this.stream.inStream = false;
             if (cleaned.lastIndexOf("_") === cleaned.length - 1) {
               cleaned = cleaned.slice(0, cleaned.length - 1);
             }

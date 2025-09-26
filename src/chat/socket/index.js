@@ -65,7 +65,7 @@ export const createSocketConnection = () => {
     const { chatConfig } = mapState(["chatConfig"]);
     store.setState("connecting", true);
     socket = new WebSocket(
-      `${chatConfig.value.wsBaseUrl}/api/publicchat/in?token=${chatConfig.value.publicToken}&session_id=${store.state.value.sessionId}&first=${firstConnection ? 1 : 0}`
+      `${chatConfig.value.wsBaseUrl}/api/publicchat/in?token=${chatConfig.value.publicToken}&session_id=${store.state.value.sessionId}&first_connection=${firstConnection ? 1 : 0}`
     );
     connectAttempt++;
 
