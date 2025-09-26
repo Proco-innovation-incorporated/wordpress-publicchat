@@ -7,7 +7,6 @@ import DefineOptions from 'unplugin-vue-define-options/vite'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const notProduction = mode !== 'production';
-  console.log(mode);
 
   let config = {
     plugins: [
@@ -25,6 +24,9 @@ export default defineConfig(({ mode }) => {
       sourcemap: notProduction ? 'inline' : false,
       minify: notProduction ? false : 'terser',
       chunkSizeWarningLimit: 5000,
+    },
+    esbuild: {
+      drop: notProduction ? [] : ['console', 'debugger'],
     },
   };
 
