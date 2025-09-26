@@ -66,6 +66,7 @@ export function purifyHtml(html) {
 
 // Transforms the citations in the html response to tooltips
 export function processCitations(html, citations) {
+  let citationNum = 1;
   const messageWithCitations = html.replace(/\[\[cite:(\d+)\]\]/g, (match, numStr) => {
     // get the citation
     const citation = citations[match];
@@ -80,7 +81,7 @@ export function processCitations(html, citations) {
       !citation.page && citation.timestamp && `at ${formatTime(citation.timestamp)}`
     ].filter(Boolean).join(' ');
 
-    const num = parseInt(numStr, 10)
+    const num = citationNum++;
     const el = `
       <a
         href="${citation.url}"
