@@ -1,7 +1,7 @@
 <template>
   <div
     ref="messageTextRef"
-    class="sc-message--text bborie-text-message"
+    class="sc-message--text"
     :style="messageColors"
   >
     <slot

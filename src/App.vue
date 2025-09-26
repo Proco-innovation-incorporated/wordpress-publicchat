@@ -33,7 +33,7 @@
     </template>
     <template v-slot:text-message-body="scopedProps">
       <p
-        class="sc-message--text-content hi-bborie"
+        class="sc-message--text-content"
         v-html="scopedProps.message.data.text"
       />
       <p
