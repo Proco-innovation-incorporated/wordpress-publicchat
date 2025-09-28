@@ -295,6 +295,15 @@ a.chatLink {
   text-align: center;
   padding: 4px 10px;
   border-radius: 6px;
+
+  .fade-enter-active {
+    transition: opacity 30s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 }
 
 .sc-typing-indicator span {

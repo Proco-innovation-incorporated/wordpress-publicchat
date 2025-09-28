@@ -38,7 +38,7 @@
     </div>
     -->
 
-    <Transition name="slide-fade">
+    <Transition name="fade">
       <div
         v-if="message.type === 'stream' && message.data.more === true"
         class="sc-typing-indicator align-right"
