@@ -61,13 +61,13 @@ cp -r ./chat-plugin/* "$RELEASE_DIR"
 
 echo "Release directory created at $RELEASE_DIR"
 
-(
+rm -rf "$SCRIPTDIR/chat-plugin.zip" && (
 	cd "$RELEASE_DIR" && \
 	zip -r "$SCRIPTDIR/chat-plugin.zip" . && \
 	echo "Release zip: $SCRIPTDIR/chat-plugin.zip"
 )
 
-rm -rf ./dist.zip && (
+rm -rf "$SCRIPTDIR/dist.zip" && (
 	cd "./dist" && \
 	zip -r "$SCRIPTDIR/dist.zip" . && \
 	echo "Distribution zip: $SCRIPTDIR/dist.zip"
