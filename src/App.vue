@@ -211,7 +211,7 @@ export default {
 
         if (
           event.length == 1 &&
-          event[0].msg_type == "bot" &&
+          this.types[event[0].msg_type] &&
           !this.isChatOpen
         ) {
           this.newMessagesCount = this.newMessagesCount + 1;
