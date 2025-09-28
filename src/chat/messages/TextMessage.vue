@@ -37,6 +37,16 @@
       </div>
     </div>
     -->
+
+    <div
+      v-if="message.type === 'stream' && message.data.more === true"
+      class="sc-typing-indicator align-right"
+      :style="messageColors"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
   </div>
 </template>
 

@@ -247,7 +247,7 @@ export default {
         );
 
         let response = event.response;
-        const isStreaming = extras.message?.streaming === true;
+        const isStreamMessage = extras.message?.streaming === true;
 
         let citations = (event.citations || []).reduce(
           (o, cur) => ({...o, [cur.anchor]: cur}), {}
@@ -258,7 +258,7 @@ export default {
             type: "text",
             data: {
               text: (
-                isStreaming
+                isStreamMessage
                   ? response
                   : (
                     event.msg_type !== "me"
@@ -277,10 +277,10 @@ export default {
           }
         );
 
-        if (isStreaming) {
+        if (isStreamMessage) {
           this.stream.inStream = true;
           message.type = "stream";
-          message.data.more = extras.message.more;
+          const isStreaming = message.data.more = extras.message.more;
           const groupId = extras.message.group_id;
 
           // use the last text message with same groupId
@@ -296,14 +296,14 @@ export default {
           let cleaned = blocks.join('');
           //console.log("cleaned", cleaned);
 
+          if (cleaned.lastIndexOf("_") === cleaned.length - 1) {
+            cleaned = cleaned.slice(0, cleaned.length - 1);
+          }
 
           // last chunk, end the stream
-          if (extras.message.more === false) {
+          if (!isStreaming) {
             this.stream.rawBuffer = "";
             this.stream.inStream = false;
-            if (cleaned.lastIndexOf("_") === cleaned.length - 1) {
-              cleaned = cleaned.slice(0, cleaned.length - 1);
-            }
           }
 
           if (oldMessage) {
