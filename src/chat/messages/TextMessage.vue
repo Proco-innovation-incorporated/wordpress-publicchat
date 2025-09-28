@@ -37,6 +37,18 @@
       </div>
     </div>
     -->
+
+    <Transition name="fade">
+      <div
+        v-if="message.type === 'stream' && message.data.more === true"
+        class="sc-typing-indicator align-right"
+        :style="messageColors"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </Transition>
   </div>
 </template>
 

@@ -220,6 +220,10 @@ button:focus-visible {
       margin: 0 !important;
     }
   }
+
+  .streaming-response {
+    display: inline-block;
+  }
 }
 
 /*
@@ -291,6 +295,15 @@ a.chatLink {
   text-align: center;
   padding: 4px 10px;
   border-radius: 6px;
+
+  .fade-enter-active {
+    transition: opacity 30s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 }
 
 .sc-typing-indicator span {
@@ -314,6 +327,10 @@ a.chatLink {
 
 .sc-typing-indicator span:nth-child(3) {
   animation-delay: -0.7s;
+}
+
+.sc-typing-indicator.align-right {
+  text-align: right;
 }
 
 @keyframes bob {

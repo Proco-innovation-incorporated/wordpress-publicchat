@@ -2,7 +2,7 @@
 /**
  * Plugin Name: EZee Assist Public Chat Plugin
  * Description: A Vue.js-based chat plugin for WordPress.
- * Version: 0.0.1
+ * Version: 0.0.16
  * Author: EZee Assist
  */
 
@@ -20,7 +20,6 @@ if(defined('DOING_CRON') || defined('REST_REQUEST')) {
 
 if(!is_divi_builder_active() && !is_admin()) {
   function chat_plugin_enqueue_scripts() {
-    // wp_enqueue_script('chat-plugin-vue', 'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js', [], null, true);
     wp_enqueue_script('chat-plugin-app', plugin_dir_url(__FILE__) . 'assets/js/widget-app.js', [], null, true);
 
   }

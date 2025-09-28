@@ -30,7 +30,7 @@ JS_FILE_PATH="./chat-plugin/assets/js/application-exec.js"
 PHP_FILE_PATH="./chat-plugin/chat-plugin.php"
 
 # Update the JavaScript file with the correct API base URL
-sed -i "s|window.apiBaseUrl = '.*';|window.apiBaseUrl = '$API_URL';|g" "$JS_FILE_PATH"
+#sed -i "s|window.apiBaseUrl = '.*';|window.apiBaseUrl = '$API_URL';|g" "$JS_FILE_PATH"
 
 # Update the PHP file with the correct API base URL
 sed -i "s|\$api_url = '.*';|\$api_url = '$API_URL';|g" "$PHP_FILE_PATH"
@@ -61,8 +61,14 @@ cp -r ./chat-plugin/* "$RELEASE_DIR"
 
 echo "Release directory created at $RELEASE_DIR"
 
-(
+rm -rf "$SCRIPTDIR/chat-plugin.zip" && (
 	cd "$RELEASE_DIR" && \
-	zip -r "$SCRIPTDIR/chat-plugin.zip" . && 
+	zip -r "$SCRIPTDIR/chat-plugin.zip" . && \
 	echo "Release zip: $SCRIPTDIR/chat-plugin.zip"
+)
+
+rm -rf "$SCRIPTDIR/dist.zip" && (
+	cd "./dist" && \
+	zip -r "$SCRIPTDIR/dist.zip" . && \
+	echo "Distribution zip: $SCRIPTDIR/dist.zip"
 )
