@@ -319,6 +319,7 @@ a.chatLink {
 .sc-typing-indicator span:nth-child(3) {
   animation-delay: -0.7s;
 }
+
 .sc-typing-indicator.align-right {
   text-align: right;
 }
