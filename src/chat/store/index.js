@@ -5,7 +5,8 @@
 
 import { computed, ref } from "vue";
 
-const EZEE_PUBLIC_CHAT_SESSION_ID = "ezee.publicChat.sessionId";
+const EZEE_HASH_SESSION_ID = "ezee_session_id";
+const EZEE_STORAGE_SESSION_ID = "ezee.publicChat.sessionId";
 
 const store = {
   state: ref({
@@ -38,11 +39,26 @@ const store = {
     };
   },
   getSessionId() {
-    let sessionId = window.sessionStorage.getItem(EZEE_PUBLIC_CHAT_SESSION_ID);
+    let sessionId;
+
+    const hashValue = window.location.hash.substr(1)
+    const hashResults = hashValue.split('&').reduce(function (res, item) {
+        var parts = item.split('=');
+        res[parts[0]] = parts[1];
+        return res;
+    }, {});
+    sessionId = hashResults[EZEE_HASH_SESSION_ID];
+    if (sessionId) {
+      window.sessionStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
+      console.log(`Saved Session ID found in URL Hash: ${sessionId}`);
+      return sessionId;
+    }
+
+    sessionId = window.sessionStorage.getItem(EZEE_STORAGE_SESSION_ID);
     console.log(`Session ID from Session Storage: ${sessionId}`);
     if (sessionId === null) {
       sessionId = window.crypto.randomUUID();
-      window.sessionStorage.setItem(EZEE_PUBLIC_CHAT_SESSION_ID, sessionId);
+      window.sessionStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
       console.log(`Generated Session ID: ${sessionId}`);
     }
     return sessionId;
