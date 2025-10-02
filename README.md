@@ -1,5 +1,7 @@
 # Public Chat component + Wordpress hooks
 
+This is the baseline Public Chat Client made available to enable EZee Assist customers to adapt for their needs
+
 ## .env.local
 
 Create the .env.local file with the following structure. You should already have values for the following variables
