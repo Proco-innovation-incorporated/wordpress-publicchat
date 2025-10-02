@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EZee Assist Public chat</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        /* use this block to configure the chat component
+        window.ezee.setupChatConfig({
+          publicToken: "",
+        });
+        */
+        window.ezee.initChat();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,142 @@
+<template>
+  <div
+    ref="scrollList"
+    class="sc-message-list"
+    :style="{ backgroundColor: colors.messageList.bg }"
+    @scroll="handleScroll"
+  >
+    <Message
+      v-for="(message, idx) in messages"
+      :key="idx"
+      :message="message"
+      :user="profile(message.author)"
+      :colors="colors"
+      :message-styling="messageStyling"
+      @remove="$emit('remove', message)"
+    >
+      <template v-slot:user-avatar="scopedProps">
+        <slot
+          name="user-avatar"
+          :user="scopedProps.user"
+          :message="scopedProps.message"
+        >
+        </slot>
+      </template>
+      <template v-slot:text-message-body="scopedProps">
+        <slot
+          name="text-message-body"
+          :message="scopedProps.message"
+          :messageColors="scopedProps.messageColors"
+          :me="scopedProps.me"
+        >
+        </slot>
+      </template>
+      <template v-slot:system-message-body="scopedProps">
+        <slot name="system-message-body" :message="scopedProps.message"> </slot>
+      </template>
+      <template v-slot:text-message-toolbox="scopedProps">
+        <slot
+          name="text-message-toolbox"
+          :message="scopedProps.message"
+          :me="scopedProps.me"
+        >
+        </slot>
+      </template>
+    </Message>
+    <Message
+      v-show="showTypingIndicator"
+      :message="{ author: showTypingIndicator, type: 'typing' }"
+      :user="profile(showTypingIndicator)"
+      :colors="colors"
+      :message-styling="messageStyling"
+    />
+  </div>
+</template>
+
+<script>
+import { mapState } from './store/';
+import Message from "./Message.vue";
+import chatIcon from "./assets/chat-icon.svg";
+
+export default {
+  components: {
+    Message,
+  },
+  props: {
+    participants: {
+      type: Array,
+      required: true,
+    },
+    messages: {
+      type: Array,
+      required: true,
+    },
+    showTypingIndicator: {
+      type: Boolean,
+      required: true,
+    },
+    colors: {
+      type: Object,
+      required: true,
+    },
+    alwaysScrollToBottom: {
+      type: Boolean,
+      required: true,
+    },
+    messageStyling: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  computed: {
+    defaultChatIcon() {
+      return chatIcon;
+    },
+  },
+  mounted() {
+    this.$nextTick(this._scrollDown());
+  },
+  updated() {
+    if (this.shouldScrollToBottom()) this.$nextTick(this._scrollDown(true));
+  },
+  setup() {
+    return mapState(["orgBranding"]);
+  },
+  methods: {
+    _scrollDown(isSmooth = false) {
+      setTimeout(() => {
+        this.$refs.scrollList.scrollTo({
+          top: this.$refs.scrollList.scrollHeight,
+          behavior: isSmooth ? "smooth" : undefined,
+        });
+      }, 10);
+    },
+    handleScroll(e) {
+      if (e.target.scrollTop === 0) {
+        this.$emit("scrollToTop");
+      }
+    },
+    shouldScrollToBottom() {
+      const scrollTop = this.$refs.scrollList.scrollTop;
+      const scrollable = scrollTop > this.$refs.scrollList.scrollHeight - 600;
+      return this.alwaysScrollToBottom || scrollable;
+    },
+    profile(author) {
+      switch (author) {
+        case "me":
+          return { imageUrl: "", name: "me" };
+          break;
+        case "bot":
+        default:
+          return {
+            imageUrl: this.orgBranding.bot_icon,
+            name: this.orgBranding.bot_name,
+          };
+          break;
+      }
+    },
+  },
+};
+</script>
+
+<style scoped></style>
