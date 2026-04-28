@@ -41,6 +41,7 @@ declare const window: any;
         enableAttachments: undefined,
         enableFeedback: undefined,
         useLogoForOpenIcon: false,
+        useLocalStorage: false,
         openWhenReady: false,
       },
       ...props,

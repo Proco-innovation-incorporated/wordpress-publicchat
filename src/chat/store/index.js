@@ -34,6 +34,10 @@ const store = {
   },
   getSessionId() {
     let sessionId;
+    const useLocalStorage = this.state?.value?.useLocalStorage === true;
+
+    const theStorageName = useLocalStorage ?  "Local" : "Session";
+    const theStorage = useLocalStorage ?  window.localStorage : window.sessionStorage;
 
     const hashValue = window.location.hash.substr(1)
     const hashResults = hashValue.split('&').reduce(function (res, item) {
@@ -43,16 +47,16 @@ const store = {
     }, {});
     sessionId = hashResults[EZEE_HASH_SESSION_ID];
     if (sessionId) {
-      window.sessionStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
+      theStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
       console.log(`Saved Session ID found in URL Hash: ${sessionId}`);
       return sessionId;
     }
 
-    sessionId = window.sessionStorage.getItem(EZEE_STORAGE_SESSION_ID);
-    console.log(`Session ID from Session Storage: ${sessionId}`);
+    sessionId = theStorage.getItem(EZEE_STORAGE_SESSION_ID);
+    console.log(`Session ID from ${theStorageName} Storage: ${sessionId}`);
     if (sessionId === null) {
       sessionId = window.crypto.randomUUID();
-      window.sessionStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
+      theStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
       console.log(`Generated Session ID: ${sessionId}`);
     }
     return sessionId;
