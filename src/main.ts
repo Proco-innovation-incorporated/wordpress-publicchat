@@ -7,10 +7,12 @@ import App from "./App.vue";
 import Launcher from "./chat/Launcher.vue";
 import store, { loadOrgBranding } from "./chat/store";
 import "./chat/socket";
+//import { applyTweaks } from "./chat/mobile";
 
 declare const window: any;
 
-(function (){
+(function () {
+  //applyTweaks();
   const isDevMode: boolean = import.meta.env.MODE === "development";
 
   window.ezee = window.ezee || {};
@@ -91,7 +93,7 @@ declare const window: any;
     await loadOrgBranding();
 
     const shadowRoot = document.createElement("div");
-    shadowRoot.id = "shadow-root"
+    shadowRoot.id = "ezee-chat-shadow-root"
     shadowRoot.className = "shadow-root"
     shadowRoot.style.position = "absolute";
     shadowRoot.style.zIndex = "999999";
