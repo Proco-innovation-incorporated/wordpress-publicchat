@@ -35,7 +35,6 @@ if(!is_divi_builder_active() && !is_admin()) {
 
     // Retrieve the necessary data
     $public_token = has_value($options['public_token']) ? esc_attr($options['public_token']) : '';
-
     $private_token = has_value($options['private_token']) ? esc_attr($options['private_token']) : '';
   }
 
@@ -95,8 +94,8 @@ if(!is_divi_builder_active() && !is_admin()) {
 
     $is_public_chat = has_value($options['public_token']);
     $is_private_chat = has_value($options['private_token']);
-    $client_email_external = get_current_user_email();
 
+    $client_email_external = get_current_user_email();
     $has_user_email = has_value($client_email_external);
 
     // Call api for user token
@@ -106,6 +105,7 @@ if(!is_divi_builder_active() && !is_admin()) {
     // Localize the script with data
     if ($has_user_token) {
       wp_localize_script('your-script-handle', 'pluginData', array(
+        '__type' => 'user_token',
         'pluginBasePath' => esc_js(plugin_dir_url(__FILE__)),
         'publicToken' => '',
         'privateToken' => '',
@@ -115,6 +115,7 @@ if(!is_divi_builder_active() && !is_admin()) {
     }
     elseif ($is_private_chat) {
       wp_localize_script('your-script-handle', 'pluginData', array(
+        '__type' => 'private_chat',
         'pluginBasePath' => esc_js(plugin_dir_url(__FILE__)),
         'publicToken' => '',
         'privateToken' => esc_js($options['private_token']),
@@ -124,6 +125,7 @@ if(!is_divi_builder_active() && !is_admin()) {
     }
     elseif ($is_public_chat) {
       wp_localize_script('your-script-handle', 'pluginData', array(
+        '__type' => 'public_chat',
         'pluginBasePath' => esc_js(plugin_dir_url(__FILE__)),
         'publicToken' => esc_js($options['public_token']),
         'privateToken' => '',
