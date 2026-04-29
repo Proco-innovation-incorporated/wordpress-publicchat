@@ -26289,7 +26289,7 @@ $$` : `${e}$$`;
           logoPathPrefix: "",
           enableAttachments: void 0,
           enableFeedback: void 0,
-          useLogoForOpenIcon: false,
+          useLogoForOpenIcon: true,
           useLocalStorage: false,
           openWhenReady: false
         },

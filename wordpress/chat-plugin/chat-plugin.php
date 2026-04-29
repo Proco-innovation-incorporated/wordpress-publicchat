@@ -29,18 +29,14 @@ if(!is_divi_builder_active() && !is_admin()) {
   }
   add_action('wp_enqueue_scripts', 'chat_plugin_enqueue_scripts');
 
-  $client_email_external;
-
   function chat_plugin_display() {
     // Retrieve stored options
     $options = get_option('chat_plugin_settings');
 
     // Retrieve the necessary data
-    $public_token = isset($options['public_token']) ? esc_attr($options['public_token']) : '';
+    $public_token = has_value($options['public_token']) ? esc_attr($options['public_token']) : '';
 
-    $private_token = isset($options['private_token']) ? esc_attr($options['private_token']) : '';
-    $current_user = wp_get_current_user();
-    $client_email_external = $current_user->user_email;
+    $private_token = has_value($options['private_token']) ? esc_attr($options['private_token']) : '';
   }
 
   add_action('wp_footer', 'chat_plugin_display');
@@ -68,7 +64,21 @@ if(!is_divi_builder_active() && !is_admin()) {
 
     $auth_response = json_decode($response, true);
 
-    return isset($auth_response['token']) ? $auth_response['token'] : null;
+    return has_value($auth_response['token']) ? $auth_response['token'] : null;
+  }
+
+  function get_current_user_email() {
+    try {
+      $current_user = wp_get_current_user();
+      return $current_user->user_email;
+    }
+    catch(Exception $e) {
+      return NULL;
+    }
+  }
+
+  function has_value($value) {
+    return isset($value) && !empty($value);
   }
 
   function enqueue_chat_plugin_script() {
@@ -83,16 +93,15 @@ if(!is_divi_builder_active() && !is_admin()) {
     // Retrieve necessary data
     $options = get_option('chat_plugin_settings');
 
-    $current_user = wp_get_current_user();
-    $client_email_external = $current_user->user_email;
+    $is_public_chat = has_value($options['public_token']);
+    $is_private_chat = has_value($options['private_token']);
+    $client_email_external = get_current_user_email();
 
-    $is_public_chat = isset($options['public_token']);
-    $is_private_chat = isset($options['private_token']);
-    $has_user_email = isset($client_email_external);
+    $has_user_email = has_value($client_email_external);
 
     // Call api for user token
     $user_token = $is_private_chat && $has_user_email ? get_user_token($options['private_token'], $client_email_external) : null;
-    $has_user_token = isset($user_token);
+    $has_user_token = has_value($user_token);
 
     // Localize the script with data
     if ($has_user_token) {
