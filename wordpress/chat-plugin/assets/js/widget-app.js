@@ -14977,7 +14977,11 @@ $$` : `${e}$$`;
       };
     },
     getSessionId() {
+      var _a3, _b;
       let sessionId;
+      const useLocalStorage = ((_b = (_a3 = this.state) == null ? void 0 : _a3.value) == null ? void 0 : _b.useLocalStorage) === true;
+      const theStorageName = useLocalStorage ? "Local" : "Session";
+      const theStorage = useLocalStorage ? window.localStorage : window.sessionStorage;
       const hashValue = window.location.hash.substr(1);
       const hashResults = hashValue.split("&").reduce(function(res, item) {
         var parts = item.split("=");
@@ -14986,13 +14990,13 @@ $$` : `${e}$$`;
       }, {});
       sessionId = hashResults[EZEE_HASH_SESSION_ID];
       if (sessionId) {
-        window.sessionStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
+        theStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
         return sessionId;
       }
-      sessionId = window.sessionStorage.getItem(EZEE_STORAGE_SESSION_ID);
+      sessionId = theStorage.getItem(EZEE_STORAGE_SESSION_ID);
       if (sessionId === null) {
         sessionId = window.crypto.randomUUID();
-        window.sessionStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
+        theStorage.setItem(EZEE_STORAGE_SESSION_ID, sessionId);
       }
       return sessionId;
     }
@@ -15566,6 +15570,50 @@ $$` : `${e}$$`;
     }, 8, ["always-scroll-to-bottom", "close", "colors", "is-open", "message-list", "message-styling", "new-messages-count", "on-message-was-sent", "open", "show-feedback", "show-file", "show-typing-indicator", "title", "title-image-url", "legal", "onOnType", "onEdit", "onRemove"]);
   }
   const App = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-ebcdfbd8"]]);
+  function treatAsMobile() {
+    return Math.min(screen.availWidth, screen.availHeight) < 450;
+  }
+  let lastViewportContent;
+  function applyChatTweaks() {
+    if (!treatAsMobile())
+      return;
+    if (!lastViewportContent) {
+      lastViewportContent = document.querySelector(
+        "meta[name='viewport']"
+      ).getAttribute(
+        "content"
+      );
+    }
+    const viewportContent = /* @__PURE__ */ new Map();
+    lastViewportContent.split(",").forEach((elem) => {
+      const parts = elem.trim().split("=");
+      viewportContent.set(parts[0], parts[1]);
+    });
+    viewportContent.set("maximum-scale", "1.0");
+    viewportContent.set("interactive-widget", "resizes-content");
+    const contentArray = [];
+    viewportContent.forEach((value, key) => {
+      contentArray.push(`${key}=${value}`);
+    });
+    const content = contentArray.join(", ");
+    document.querySelector(
+      'meta[name="viewport"]'
+    ).setAttribute(
+      "content",
+      content
+    );
+  }
+  function removeChatTweaks() {
+    if (!treatAsMobile())
+      return;
+    document.querySelector(
+      'meta[name="viewport"]'
+    ).setAttribute(
+      "content",
+      lastViewportContent
+    );
+    lastViewportContent = void 0;
+  }
   const CloseIcon$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAfCAMAAACxiD++AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAtUExURUxpcf///////////////////////////////////////////////////////3EAnbYAAAAOdFJOUwADZ66SoQjEhnS7/gsNGQL7+wAAAKtJREFUKM+F01sOhCAQRNESFV/I/pc70Og0YJfyJbmHhBAbGGYHstw8IPV4EOGOmERYIhGpxyUAJxHSz/xlC+1FxE64qB1yj1ZID7oXsel+63ovnj2JXUXue+hvrcLugL+EdG+9XBG8X+Kl34J3YM1g/egvIvdx5EK691RIz78YEXdnQrst6m6JqemXmNo+D/WJNAyVePZWWL0WdlfB+l+UAQQReaAc65DB/wGsZgzLN0IQWAAAAABJRU5ErkJggg==";
   const CloseFullIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABOUlEQVRYR+VWuxHCMAyNKeGAGdiCliVgRliCkjFgBuDowDznEs44sq1gKSnIXQqIrfeRLNlUIz9mZPzqfwhYa53YF96DMWbXOj+IAx54i7sEiav7UUwAwY91IGM2VD0R4DOsfYg5AADbEOiIIcAXAL/5RCUcIAlwwKVSECNQ/988HeWqKWjTkgNXcSAAnyPn91SzE62BvuCiDgQqs8rFa8AjwAbXdIBK+wX1sAo/iNUAY6ryCaCYTgi4ZgR1LbhIBLl5dAIp5cFR03EgRiAEjw0hTup6H8OwySBAPdVUaiBUQHW41BgWc4AYqZ8mo04gBe4UqhLgXCbUCHDAVR3gXiaw7tycgk5//6kIEXCCjU9vc/Qa1Qcgt/arFYPEHhu2eAcBJ8cxSEz9e3tOQen3oklWCi5yISkl8QZ337YhRMNepQAAAABJRU5ErkJggg==";
   const OpenFullIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA1klEQVRYR+2WQRKAIAhFc1f3P2ztCptsjFCR/FPT6LK09wDF3PDycC/zhy7QLAMrDU05HY143n8EpOgpKSM9ny8RozLABSS4nwMrQSwgwKeQCbiABCfoEjYpVCAF99mBC+TgcIESHCqggcMEtPBchzR3whbwvS9o+reiyUz+qFm+VS3QKvIgexNInddjI/Hebo68WqB15FUCKLi4CXkJkPCiABqeFaCX5xV61OvxhpOOafIUsMkQeCkDwQEG1wqIDY7/WFi64DcFrJFY11XfBVZQal0X2ACFl5shPhyqtwAAAABJRU5ErkJggg==";
@@ -25791,9 +25839,13 @@ $$` : `${e}$$`;
     },
     watch: {
       // Watch the 'message' prop
-      // isOpen(newVal, oldVal) {
-      //   this.$refs.messagesList._scrollDown();
-      // },
+      isOpen(newVal, oldVal) {
+        if (newVal === true) {
+          applyChatTweaks();
+        } else {
+          removeChatTweaks();
+        }
+      }
     },
     data() {
       return {
@@ -26238,6 +26290,7 @@ $$` : `${e}$$`;
           enableAttachments: void 0,
           enableFeedback: void 0,
           useLogoForOpenIcon: false,
+          useLocalStorage: false,
           openWhenReady: false
         },
         ...props
@@ -26264,7 +26317,7 @@ $$` : `${e}$$`;
     window.ezee.initChat = async () => {
       await loadOrgBranding();
       const shadowRoot = document.createElement("div");
-      shadowRoot.id = "shadow-root";
+      shadowRoot.id = "ezee-chat-shadow-root";
       shadowRoot.className = "shadow-root";
       shadowRoot.style.position = "absolute";
       shadowRoot.style.zIndex = "999999";
